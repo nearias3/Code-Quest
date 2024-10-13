@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../utils/mutations";
 import { useNavigate, Link } from "react-router-dom";
@@ -18,7 +18,7 @@ function Login() {
     try {
       const { data } = await login({ variables: { ...formState } });
       localStorage.setItem("token", data.login.token);
-      navigate("/html");
+      navigate("/homepage");
     } catch (e) {
       console.error(e);
     }
@@ -45,9 +45,11 @@ function Login() {
         <button type="submit">Login</button>
       </form>
       {error && <p>Login failed. Please try again.</p>}
-      <p>Don't have an account? <Link to="/signup">Sign up here</Link></p> {/* Link to signup */}
+      <p>
+        Don&apos;t have an account? <Link to="/signup">Sign up here</Link>
+      </p>{" "}
+      {/* Link to signup */}
     </div>
-
   );
 }
 

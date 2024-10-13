@@ -19,7 +19,7 @@ const HtmlStage = () => {
 
   return (
     <GameLayout
-      stageTitle="HTML Stage"
+      stageTitle="Stage 1: HTML"
       challengeDescription={challengeDescription}>
       <MonacoEditor
         height="400px"

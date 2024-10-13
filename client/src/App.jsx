@@ -9,14 +9,15 @@ import SqlStage from "./pages/SqlStage.jsx";
 import GraphQLStage from "./pages/GraphQLStage.jsx";
 import FinalBoss from "./pages/FinalBoss.jsx";
 
+const userProgress = ["html"]; //// For now, we will use this to simulate progress. Later we can update this to fetch real progress from back-end
+
 function App() {
-  const userProgress = ["html"]; //// For now, we will use this to simulate progress. Later we can update this to fetch real progress from back-end
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/homepage" element={<Homepage userProgress={userProgress} />} /> {/* Pass user progress to Homepage component */}
+        <Route path="/homepage" element={<Homepage progress={userProgress} />} /> {/* Pass user progress to Homepage component */}
         <Route path="/html" element={<HtmlStage />} />
         <Route path="/css" element={<CssStage />} />
         <Route path="/javascript" element={<JsStage />} />

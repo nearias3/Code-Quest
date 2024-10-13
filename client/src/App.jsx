@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import HtmlStage from "./pages/HtmlStage";
-import CssStage from "./pages/CssStage";
-import JsStage from "./pages/JsStage";
-import SqlStage from "./pages/SqlStage";
-import GraphQLStage from "./pages/GraphQLStage";
-import FinalBoss from "./pages/FinalBoss";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
+import HtmlStage from "./pages/HtmlStage.jsx";
+import CssStage from "./pages/CssStage.jsx";
+import JsStage from "./pages/JsStage.jsx";
+import SqlStage from "./pages/SqlStage.jsx";
+import GraphQLStage from "./pages/GraphQLStage.jsx";
+import FinalBoss from "./pages/FinalBoss.jsx";
 
 function App() {
   return (

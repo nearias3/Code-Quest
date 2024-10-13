@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   progress: {
     type: [String], // Track completed stages
-    default: [],
+    default: [], // The user can start with no stages completed / blank progress
   },
 });
 

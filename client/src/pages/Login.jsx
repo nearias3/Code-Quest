@@ -18,7 +18,7 @@ function Login() {
     try {
       const { data } = await login({ variables: { ...formState } });
       localStorage.setItem("token", data.login.token);
-      navigate("/homepage");
+      navigate("/game");
     } catch (e) {
       console.error(e);
     }

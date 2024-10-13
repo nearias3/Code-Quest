@@ -20,14 +20,5 @@ export const LOGIN_USER = gql`
   }
 `;
 
-// Mutation to mark a challenge as complete (do we need this?)
-export const COMPLETE_STAGE = gql`
-  mutation completeStage($stage: String!) {
-    completeStage(stage: $stage) {
-      progress
-    }
-  }
-`;
-
 
 

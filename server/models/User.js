@@ -15,7 +15,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  progress: [String], // Store IDs of completed challenges
+  progress: {
+    type: [String], // Track completed stages
+    default: [],
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

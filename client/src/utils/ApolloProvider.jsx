@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import {
   ApolloClient,
   InMemoryCache,
@@ -27,6 +28,10 @@ const client = new ApolloClient({
 
 const ApolloProvider = ({ children }) => {
   return <Provider client={client}>{children}</Provider>;
+};
+
+ApolloProvider.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 export default ApolloProvider;

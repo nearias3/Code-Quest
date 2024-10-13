@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../utils/mutations";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const [formState, setFormState] = useState({ username: "", password: "" });
@@ -45,7 +45,9 @@ function Login() {
         <button type="submit">Login</button>
       </form>
       {error && <p>Login failed. Please try again.</p>}
+      <p>Don't have an account? <Link to="/signup">Sign up here</Link></p> {/* Link to signup */}
     </div>
+
   );
 }
 

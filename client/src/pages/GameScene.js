@@ -114,6 +114,93 @@ class GameScene extends Phaser.Scene {
   }
 }
 
+class WorldMapScene extends Phaser.Scene {
+  constructor() {
+    super({ key: "WorldMapScene" });
+  }
+
+  preload() {
+    // Load assets for the world map
+    this.load.image("placeholderWorldMap", "src/assets/placeholderWorldMap.png"); // Update the path
+    this.load.image("placeholderCharacter", "src/assets/placeholderCharacter.png"); // Ensure you load your player sprite here
+  }
+
+  create() {
+    // Add the world map image
+    const mapImage = this.add.image(400, 300, "placeholderWorldMap"); // Center it in the canvas
+    mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height); // Resize to fit the screen
+
+    this.add
+      .text(400, 50, "World Map", { fontSize: "32px", fill: "#fff" })
+      .setOrigin(0.5);
+
+    // Create the player sprite
+    this.player = this.physics.add.sprite(400, 300, "placeholderCharacter");
+    this.player.setCollideWorldBounds(true); // Prevents the player from going out of bounds
+
+    const scaleFactor = 0.1; // Adjust this factor to make the sprite smaller
+    this.player.setDisplaySize(
+      this.player.width * scaleFactor,
+      this.player.height * scaleFactor
+    );
+
+    // Create battle instances
+    this.battleZone = this.add.zone(500, 300, 100, 100).setOrigin(0);
+    this.battleZone.setInteractive();
+
+    this.battleZone.on("pointerdown", () => {
+      this.scene.start("BattleScene");
+    });
+
+    // Setup keyboard controls for WASD
+    this.cursors = this.input.keyboard.addKeys({
+      w: Phaser.Input.Keyboard.KeyCodes.W,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      s: Phaser.Input.Keyboard.KeyCodes.S,
+      d: Phaser.Input.Keyboard.KeyCodes.D,
+    });
+  }
+
+  update() {
+    // Handle player movement with WASD
+    if (this.cursors.a.isDown) {
+      this.player.setVelocityX(-160);
+    } else if (this.cursors.d.isDown) {
+      this.player.setVelocityX(160);
+    } else {
+      this.player.setVelocityX(0);
+    }
+
+    if (this.cursors.w.isDown) {
+      this.player.setVelocityY(-160);
+    } else if (this.cursors.s.isDown) {
+      this.player.setVelocityY(160);
+    } else {
+      this.player.setVelocityY(0);
+    }
+  }
+}
+
+class BattleScene extends Phaser.Scene {
+  constructor() {
+    super({ key: "BattleScene" });
+  }
+
+  preload() {
+    // Load battle assets
+  }
+
+  create() {
+    this.add
+      .text(400, 300, "Battle Scene", { fontSize: "32px", fill: "#fff" })
+      .setOrigin(0.5);
+    // Setup battle mechanics
+  }
+
+  update() {
+    // Handle battle logic
+  }
+}
 
 const config = {
   type: Phaser.AUTO,

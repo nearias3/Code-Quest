@@ -131,7 +131,7 @@ class WorldMapScene extends Phaser.Scene {
     mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height); // Resize to fit the screen
 
     this.add
-      .text(400, 50, "World Map", { fontSize: "32px", fill: "#fff" })
+      .text(400, 50, "Dimension of Magic", { fontSize: "32px", fill: "#fff" })
       .setOrigin(0.5);
 
     // Create the player sprite

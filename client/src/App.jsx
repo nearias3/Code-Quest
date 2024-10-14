@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { ApolloProvider } from "@apollo/client";
 import client from "./graphql/client";
-import GameScene from "./scenes/GameScene"; // Import GameScene
+import GameScene from "./pages/GameScene"; // Import GameScene
 
 const App = () => {
   useEffect(() => {

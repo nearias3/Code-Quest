@@ -55,7 +55,7 @@ class GameScene extends Phaser.Scene {
 
     // Add full-screen button
     this.fullscreenButton = this.add
-      .text(750, 550, "[ ]", { fontSize: "24px", fill: "#fff" }) // Use brackets for the button
+      .text(750, 550, "[]", { fontSize: "24px", fill: "#fff" }) // Use brackets for the button
       .setOrigin(0.5)
       .setInteractive()
       .setPadding(5);

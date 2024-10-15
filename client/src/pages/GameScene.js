@@ -150,15 +150,22 @@ class GameScene extends Phaser.Scene {
     });
   }
 
-  // Add signup attempt similar to login attempt
+  // Singup attempt
   async attemptSignup(username, email, password) {
     try {
-      const { data } = await signupUser(username, email, password);
+      const response = await signupUser(username, email, password);
 
-      // On successful signup
-      localStorage.setItem("token", data.signup.token);
-      console.log("Signup successful, token stored.");
-      this.scene.start("WorldMapScene"); // Start the game after successful signup
+      console.log("Signup response:", response); // Ensure we are logging the actual response
+
+      // Check if response and data exist
+      if (response && response.signup && response.signup.token) {
+        // On successful signup
+        localStorage.setItem("token", response.signup.token);
+        console.log("Signup successful, token stored.");
+        this.scene.start("WorldMapScene"); // Start the game after successful signup
+      } else {
+        throw new Error("Signup failed. Please try again.");
+      }
     } catch (error) {
       console.error("Signup failed", error);
       this.add
@@ -172,18 +179,25 @@ class GameScene extends Phaser.Scene {
 
   async attemptLogin(username, password) {
     try {
-      const { data } = await loginUser(username, password); // Calls the login function
+      const response = await loginUser(username, password);
 
-      // On successful login
-      localStorage.setItem("token", data.login.token);
-      console.log("Login successful, token stored.");
+      // Log the full response to inspect its structure
+      console.log("Login response:", response);
 
-      // Emit the login event so React can respond
-      this.events.emit("loginEvent");
+      if (response && response.login && response.login.token) {
+        // On successful login
+        localStorage.setItem("token", response.login.token);
+        console.log("Login successful, token stored.");
 
-      this.scene.start("WorldMapScene"); // Start the game after successful login
+        // Emit the login event so React can respond
+        this.events.emit("loginEvent");
+
+        this.scene.start("WorldMapScene"); // Start the game after successful login
+      } else {
+        throw new Error("Login failed. Please try again.");
+      }
     } catch (error) {
-      console.error("Login failed", error);
+      console.error("Login failed with error:", error);
       this.add
         .text(400, 400, "Login failed. Please try again.", {
           fontSize: "18px",

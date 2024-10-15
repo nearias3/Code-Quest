@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { User, Challenge } = require("../models");
+const { User } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 
 const resolvers = {
@@ -10,9 +10,6 @@ const resolvers = {
         throw new AuthenticationError("Not logged in");
       }
       return User.findById(user._id);
-    },
-    challenges: async (_, { type }) => {
-      return Challenge.find({ type });
     },
   },
   Mutation: {
@@ -35,16 +32,6 @@ const resolvers = {
       const user = await User.create({ username: normalizedUsername, email, password: hashedPw });
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
       return { ...user._doc, token };
-    },
-    completeChallenge: async (_, { challengeId }, { user }) => {
-      if (!user) {
-        throw new AuthenticationError("Not logged in");
-      }
-      return User.findByIdAndUpdate(
-        user._id,
-        { $addToSet: { progress: challengeId } },
-        { new: true }
-      );
     },
   },
 };

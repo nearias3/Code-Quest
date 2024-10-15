@@ -42,13 +42,20 @@ export async function loginUser(username, password) {
 /// Signup function
 export async function signupUser(username, email, password) {
   try {
-    const { data } = await client.mutate({
+    const response = await client.mutate({
       mutation: SIGNUP_USER,
       variables: { username, email, password },
     });
-    return data;
+
+    console.log("Signup response:", response);
+
+    if (!response.data || !response.data.signup) {
+      throw new Error("Signup failed. Please try again.");
+    }
+
+    return response.data;
   } catch (error) {
     console.error("Signup error:", error);
-    throw new Error("Signup failed. Please try again.");
+    throw new Error("Signup failed. Please try again."); // Ensure error is thrown and caught in GameScene.js
   }
 }

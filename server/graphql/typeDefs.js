@@ -9,22 +9,13 @@ const typeDefs = gql`
     token: String
   }
 
-  type Challenge {
-    _id: ID
-    type: String # These will be things like HTML, CSS, JavaScript, SQL, etc.
-    description: String
-    solution: String
-  }
-
   type Query {
     me: User
-    challenges(type: String!): [Challenge]
   }
 
   type Mutation {
-    login(username: String!, password: String!): User
     signup(username: String!, email: String!, password: String!): User
-    completeChallenge(challengeId: ID!): User
+    login(username: String!, password: String!): User
   }
 `;
 

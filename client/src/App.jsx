@@ -1,5 +1,4 @@
-import { ApolloProvider } from "@apollo/client";
-import client from "./graphql/client";
+import ApolloProvider from "./utils/ApolloProvider";
 import GameArea from "./components/GameArea.jsx";
 import { BrowserRouter as Router } from "react-router-dom";
 
@@ -9,7 +8,7 @@ const App = () => {
   };
 
   return (
-    <ApolloProvider client={client}>
+    <ApolloProvider>
       <Router>
         <div>
           <GameArea onLogin={handleLogin} />

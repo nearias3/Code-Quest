@@ -17,7 +17,8 @@ const resolvers = {
   },
   Mutation: {
     login: async (_, { username, password }) => {
-      const user = await User.findOne({ username });
+      const normalizedUsername = username.trim().toLowerCase();
+      const user = await User.findOne({ username: normalizedUsername });
       if (!user) {
         throw new AuthenticationError("Invalid credentials");
       }
@@ -29,8 +30,9 @@ const resolvers = {
       return { ...user._doc, token };
     },
     signup: async (_, { username, email, password }) => {
+      const normalizedUsername = username.trim().toLowerCase();
       const hashedPw = await bcrypt.hash(password, 10);
-      const user = await User.create({ username, email, password: hashedPw });
+      const user = await User.create({ username: normalizedUsername, email, password: hashedPw });
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
       return { ...user._doc, token };
     },

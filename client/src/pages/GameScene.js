@@ -21,7 +21,7 @@ class GameScene extends Phaser.Scene {
     this.menuOptions = [
       { text: "New Game", action: () => this.startNewGame() },
       { text: "Load Game", action: this.loadGame.bind(this) },
-      { text: "Login", action: this.login.bind(this) },
+      { text: "Login", action: this.events.emit("loginEvent") },
       { text: "Settings", action: this.openSettings.bind(this) },
       { text: "Exit", action: this.exitGame.bind(this) },
     ];
@@ -86,17 +86,12 @@ class GameScene extends Phaser.Scene {
   }
 
   startNewGame() {
-    this.scene.start("WorldMapScene"); // Change to your desired game start
+    this.scene.start("WorldMapScene"); // Start the game
   }
 
   loadGame() {
     console.log("Load Game clicked!");
     // Implement load game functionality
-  }
-
-  login() {
-    console.log("Login clicked!");
-    // Implement login functionality
   }
 
   openSettings() {

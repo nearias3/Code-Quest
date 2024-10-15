@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { SIGNUP_USER } from "../utils/mutations";
 import { useNavigate } from "react-router-dom";

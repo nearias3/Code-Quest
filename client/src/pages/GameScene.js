@@ -1,17 +1,22 @@
 import Phaser from "phaser";
+import { loginUser } from "../utils/authService";
 
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "GameScene" });
+    this.username = "";
+    this.password = "";
   }
 
   preload() {
     // Load assets (sprites, images, etc.)
+    console.log("GameScene: preload");
   }
-  
+
   create() {
+    console.log("GameScene: create");
     this.add
-      .text(400, 100, "Wizards Apprentice: Pieces of the Master", {
+      .text(400, 100, "Wizard's Apprentice: Pieces of the Master", {
         fontSize: "28px",
         fill: "#fff",
       })
@@ -21,7 +26,7 @@ class GameScene extends Phaser.Scene {
     this.menuOptions = [
       { text: "New Game", action: () => this.startNewGame() },
       { text: "Load Game", action: this.loadGame.bind(this) },
-      { text: "Login", action: this.events.emit("loginEvent") },
+      { text: "Login", action: this.showLoginForm.bind(this) },
       { text: "Settings", action: this.openSettings.bind(this) },
       { text: "Exit", action: this.exitGame.bind(this) },
     ];
@@ -46,10 +51,7 @@ class GameScene extends Phaser.Scene {
       });
 
       // Add left click event
-      text.on("pointerdown", () => {
-        option.action(); // Call the associated action
-      });
-
+      text.on("pointerdown", () => option.action()); // Call the associated action
       return text;
     });
 
@@ -85,7 +87,55 @@ class GameScene extends Phaser.Scene {
     }
   }
 
+  showLoginForm() {
+    // Text inputs in the game window for login credentials
+    this.add.dom(400, 250).createFromHTML(`
+      <input type="text" placeholder="Username" id="username" style="padding: 10px; width: 200px;">
+    `);
+
+    this.add.dom(400, 300).createFromHTML(`
+      <input type="password" placeholder="Password" id="password" style="padding: 10px; width: 200px;">
+    `);
+
+    const loginButton = this.add.dom(400, 350).createFromHTML(`
+      <button id="login-btn" style="padding: 10px 20px;">Login</button>
+    `);
+
+    // Handle login button click
+    loginButton.addListener("click").on("click", () => {
+      console.log("Login button clicked!");
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      this.attemptLogin(username, password); // Trigger login attempt
+    });
+  }
+
+  async attemptLogin(username, password) {
+    try {
+      const { data } = await loginUser(username, password); // Calls the login function
+
+      // On successful login
+      localStorage.setItem("token", data.login.token);
+      console.log("Login successful, token stored.");
+
+      // Emit the login event so React can respond
+      this.events.emit("loginEvent");
+
+      this.scene.start("WorldMapScene"); // Start the game after successful login
+    } catch (error) {
+      console.error("Login failed", error);
+      this.add
+        .text(400, 400, "Login failed. Please try again.", {
+          fontSize: "18px",
+          fill: "#ff0000",
+        })
+        .setOrigin(0.5);
+    }
+  }
+
   startNewGame() {
+    console.log("Start New Game clicked!");
     this.scene.start("WorldMapScene"); // Start the game
   }
 
@@ -197,20 +247,5 @@ class BattleScene extends Phaser.Scene {
   }
 }
 
-const config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  scene: [GameScene, WorldMapScene, BattleScene],
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 0 },
-      debug: false,
-    },
-  },
-};
-
-const Game = new Phaser.Game(config);
-export default Game;
-export { GameScene };
+export { GameScene, WorldMapScene, BattleScene };
+export default GameScene;

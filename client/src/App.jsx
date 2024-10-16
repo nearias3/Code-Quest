@@ -1,17 +1,19 @@
-import { useEffect } from "react";
-import { ApolloProvider } from "@apollo/client";
-import client from "./graphql/client";
-import GameScene from "./pages/GameScene"; // Import GameScene
+import ApolloProvider from "./utils/ApolloProvider";
+import GameArea from "./components/GameArea.jsx";
+import { BrowserRouter as Router } from "react-router-dom";
 
 const App = () => {
-  useEffect(() => {
-    // Initialize the Phaser game when the component mounts
-    new GameScene(); // Instantiate GameScene or handle Phaser initialization here
-  }, []);
+  const handleLogin = () => {
+    console.log("User logged in!");
+  };
 
   return (
-    <ApolloProvider client={client}>
-      {/* Add any additional React components here */}
+    <ApolloProvider>
+      <Router>
+        <div>
+          <GameArea onLogin={handleLogin} />
+        </div>
+      </Router>
     </ApolloProvider>
   );
 };

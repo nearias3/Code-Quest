@@ -1,17 +1,24 @@
 import Phaser from "phaser";
+import { loginUser } from "../utils/authService";
+import { signupUser } from "../utils/authService";
+
 
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "GameScene" });
+    this.username = "";
+    this.password = "";
   }
 
   preload() {
     // Load assets (sprites, images, etc.)
+    console.log("GameScene: preload");
   }
-  
+
   create() {
+    console.log("GameScene: create");
     this.add
-      .text(400, 100, "Wizards Apprentice: Pieces of the Master", {
+      .text(400, 100, "Wizard's Apprentice: Pieces of the Master", {
         fontSize: "28px",
         fill: "#fff",
       })
@@ -21,7 +28,7 @@ class GameScene extends Phaser.Scene {
     this.menuOptions = [
       { text: "New Game", action: () => this.startNewGame() },
       { text: "Load Game", action: this.loadGame.bind(this) },
-      { text: "Login", action: this.login.bind(this) },
+      { text: "Login", action: this.showLoginForm.bind(this) },
       { text: "Settings", action: this.openSettings.bind(this) },
       { text: "Exit", action: this.exitGame.bind(this) },
     ];
@@ -46,10 +53,7 @@ class GameScene extends Phaser.Scene {
       });
 
       // Add left click event
-      text.on("pointerdown", () => {
-        option.action(); // Call the associated action
-      });
-
+      text.on("pointerdown", () => option.action()); // Call the associated action
       return text;
     });
 
@@ -85,18 +89,132 @@ class GameScene extends Phaser.Scene {
     }
   }
 
+  showLoginForm() {
+    // Add a form to contain the login inputs and button
+    const loginForm = this.add.dom(400, 250).createFromHTML(`
+    <form id="login-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
+      <input type="text" placeholder="Username" id="username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
+      <input type="password" placeholder="Password" id="password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
+      <button type="submit" id="login-btn" style="padding: 10px 20px; border-radius: 5px; background-color: #ffbf00; color: #000; border: none;">Login</button>
+      <p style="margin-top: 10px; color: #fff;">Don’t have an account? <a href="#" id="signup-link" style="color: #ffbf00; cursor: pointer;">Sign up here</a></p>
+    </form>
+    
+  `);
+
+    // Add form submit event listener
+    loginForm.addListener("submit").on("submit", (event) => {
+      event.preventDefault(); // Prevent page refresh
+      console.log("Login form submitted");
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      this.attemptLogin(username, password); // Trigger login attempt
+    });
+
+    // Handle the "Sign up" link click to show signup form
+    const signupLink = document.getElementById("signup-link");
+    signupLink.addEventListener("click", (event) => {
+      event.preventDefault(); // Prevent page refresh
+      this.showSignupForm(); // Switch to the signup form
+    });
+  }
+
+  showSignupForm() {
+    // Add a signup form
+    const signupForm = this.add.dom(400, 250).createFromHTML(`
+    <form id="signup-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
+      <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
+      <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
+      <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
+      <button type="submit" id="signup-btn" style="padding: 10px 20px; border-radius: 5px; background-color: #ffbf00; color: #000; border: none;">Sign Up</button>
+      <p style="margin-top: 10px; color: #fff;">Already have an account? <a href="#" id="login-link" style="color: #ffbf00; cursor: pointer;">Log in here</a></p>
+    </form>
+  `);
+
+    // Handle form submit for signup
+    signupForm.addListener("submit").on("submit", (event) => {
+      event.preventDefault(); // Prevent page refresh
+      const username = document.getElementById("signup-username").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+
+      this.attemptSignup(username, email, password); // Trigger signup attempt
+    });
+
+    // Handle the "Log in" link click to show login form again
+    const loginLink = document.getElementById("login-link");
+    loginLink.addEventListener("click", (event) => {
+      event.preventDefault(); // Prevent page refresh
+      this.showLoginForm(); // Switch back to the login form
+    });
+  }
+
+  // Singup attempt
+  async attemptSignup(username, email, password) {
+    try {
+      const response = await signupUser(username, email, password);
+
+      console.log("Signup response:", response); // Ensure we are logging the actual response
+
+      // Check if response and data exist
+      if (response && response.signup && response.signup.token) {
+        // On successful signup
+        localStorage.setItem("token", response.signup.token);
+        console.log("Signup successful, token stored.");
+        this.scene.start("WorldMapScene"); // Start the game after successful signup
+      } else {
+        throw new Error("Signup failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Signup failed", error);
+      this.add
+        .text(400, 400, "Signup failed. Please try again.", {
+          fontSize: "18px",
+          fill: "#ff0000",
+        })
+        .setOrigin(0.5);
+    }
+  }
+
+  async attemptLogin(username, password) {
+    try {
+      const response = await loginUser(username, password);
+
+      // Log the full response to inspect its structure
+      console.log("Login response:", response);
+
+      if (response && response.login && response.login.token) {
+        // On successful login
+        localStorage.setItem("token", response.login.token);
+        console.log("Login successful, token stored.");
+
+        // Emit the login event so React can respond
+        this.events.emit("loginEvent");
+
+        this.scene.start("WorldMapScene"); // Start the game after successful login
+      } else {
+        throw new Error("Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login failed with error:", error);
+      this.add
+        .text(400, 400, "Login failed. Please try again.", {
+          fontSize: "18px",
+          fill: "#ff0000",
+        })
+        .setOrigin(0.5);
+    }
+  }
+
   startNewGame() {
-    this.scene.start("WorldMapScene"); // Change to your desired game start
+    console.log("Start New Game clicked!");
+    this.scene.start("WorldMapScene"); // Start the game
   }
 
   loadGame() {
     console.log("Load Game clicked!");
     // Implement load game functionality
-  }
-
-  login() {
-    console.log("Login clicked!");
-    // Implement login functionality
   }
 
   openSettings() {
@@ -202,20 +320,5 @@ class BattleScene extends Phaser.Scene {
   }
 }
 
-const config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  scene: [GameScene, WorldMapScene, BattleScene],
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 0 },
-      debug: false,
-    },
-  },
-};
-
-const Game = new Phaser.Game(config);
-export default Game;
-export { GameScene };
+export { GameScene, WorldMapScene, BattleScene };
+export default GameScene;

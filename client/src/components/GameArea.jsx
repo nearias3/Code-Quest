@@ -1,6 +1,13 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
-import { GameScene, WorldMapScene, BattleScene } from '../pages/GameScene.js'
+import {
+  GameScene,
+  WorldMapScene,
+  BattleScene,
+  Map1Scene,
+  Map2Scene,
+  Map3Scene,
+} from "../pages/GameScene.js";
 import PropTypes from "prop-types";
 
 const GameArea = ({ onLogin }) => {
@@ -12,7 +19,7 @@ const GameArea = ({ onLogin }) => {
       parent: gameContainerRef.current, // phaser gets attached to this div
       width: 800,
       height: 600,
-      scene: [GameScene, WorldMapScene, BattleScene],
+      scene: [GameScene, WorldMapScene, BattleScene, Map1Scene, Map2Scene, Map3Scene],
       physics: {
         default: "arcade",
         arcade: {

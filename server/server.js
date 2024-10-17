@@ -36,11 +36,13 @@ async function startServer() {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { playerStats, progress } = req.body;
+    const { slotNumber, playerStats, progress } = req.body;
 
     try {
+
+      // Saves game to the specified slot (1, 2, or 3)
       const saveSlot = await SaveSlot.findOneAndUpdate(
-        { userId: user._id, slotNumber: 1 },
+        { userId: user._id, slotNumber },
         { playerStats, progress },
         { new: true, upsert: true }
       );
@@ -51,6 +53,31 @@ async function startServer() {
       res.status(500).json({ message: "Failed to save game", error });
     }
   });
+
+  // Route to load the game
+  app.post("/api/load-game", async (req, res) => {
+    const user = authMiddleware(req);
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { slotNumber } = req.body;
+
+    try {
+      const saveSlot = await SaveSlot.findOne({ userId: user._id, slotNumber });
+      if (!saveSlot) {
+        return res
+          .status(404)
+          .json({ message: "No save found for this slot." });
+      }
+
+      res.json(saveSlot); // Return the saved data
+    } catch (error) {
+      console.error("Error loading game:", error);
+      res.status(500).json({ message: "Failed to load game", error });
+    }
+  });
+
 
 // Connect to the server
   app.use(

@@ -55,12 +55,11 @@ class GameScene extends Phaser.Scene {
       });
 
       // Add "Save Game" option if the user is logged in
-      menuOptions.push({ 
-        text: "Save Game", 
+      menuOptions.push({
+        text: "Save Game",
         action: this.saveGame.bind(this),
-    });
-  }
-    else {
+      });
+    } else {
       menuOptions.push({
         text: "Login",
         action: this.showLoginForm.bind(this),
@@ -74,15 +73,15 @@ class GameScene extends Phaser.Scene {
 
     // Add settings regardless of LoggedInStatus
     menuOptions.push({
-    text: "Settings", 
-    action: this.openSettings.bind(this) 
-  });
+      text: "Settings",
+      action: this.openSettings.bind(this),
+    });
 
     // Add "Logout" option if logged in, else nothing
     if (this.isLoggedIn) {
-      menuOptions.push({ 
-        text: "Logout", 
-        action: this.logout.bind(this)
+      menuOptions.push({
+        text: "Logout",
+        action: this.logout.bind(this),
       });
     }
 
@@ -233,6 +232,36 @@ class GameScene extends Phaser.Scene {
   async saveGame() {
     console.log("Save Game clicked!");
 
+    // Clear current menu items
+    this.children.removeAll();
+
+    // Display save slot options
+    this.add
+      .text(400, 100, "Choose a Save Slot:", { fontSize: "28px", fill: "#fff" })
+      .setOrigin(0.5);
+
+    // Create save slot buttons
+    const saveSlots = [1, 2, 3];
+    saveSlots.forEach((slot, index) => {
+      const text = this.add
+        .text(400, 200 + index * 50, `Save Slot ${slot}`, {
+          fontSize: "24px",
+          fill: "#fff",
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+      // When the slot is clicked, trigger the actual save function
+      text.on("pointerover", () => text.setFill("#ff0"));
+      text.on("pointerout", () => text.setFill("#fff"));
+      text.on("pointerdown", () => this.performSave(slot)); // Save to the selected slot
+    });
+  }
+
+  // Perform save in the selected slot
+  async performSave(slotNumber) {
+    console.log(`Saving game to slot ${slotNumber}...`);
+
     // Mockup: Replace this actual game data (e.g., player stats, progress)
     const playerStats = {
       level: 5,
@@ -247,13 +276,14 @@ class GameScene extends Phaser.Scene {
 
     try {
       // Replace this with actual API function for saving the game once we build that
-      const response = await fetch("/api/save-game", {
+      const response = await fetch("http://localhost:4000/api/save-game", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
+          slotNumber,
           playerStats,
           progress,
         }),
@@ -262,7 +292,7 @@ class GameScene extends Phaser.Scene {
       const result = await response.json();
 
       if (response.ok) {
-        console.log("Game saved successfully:", result);
+        console.log("Game saved successfully to slot ${slotNumber}:", result);
         this.add
           .text(400, 400, "Game Saved!", {
             fontSize: "18px",
@@ -290,13 +320,29 @@ class GameScene extends Phaser.Scene {
 
   // Load game slots
   showLoadSlots() {
-    this.children.removeAll(); // Clear screen
-    const saveSlots = [1, 2, 3];
-    saveSlots.forEach((slot, index) => {
+    this.children.removeAll(); // Clear menu items
+
+    // Display load slot options
+      this.add
+        .text(400, 100, "Choose a Load Slot:", {
+          fontSize: "28px",
+          fill: "#fff",
+        })
+        .setOrigin(0.5);
+
+    // Create load slot buttons
+    const loadSlots = [1, 2, 3]; 
+    loadSlots.forEach((slot, index) => {
+      const text =
       this.add
         .text(400, 300 + index * 50, `Load Slot ${slot}`, { fill: "#fff" })
-        .setInteractive()
-        .on("pointerdown", () => this.loadGame(slot));
+        .setOrigin(0.5)
+        .setInteractive();
+
+      // When the slot is clicked, trigger the actual load function
+      text.on("pointerover", () => text.setFill("#ff0"));
+      text.on("pointerout", () => text.setFill("#fff"));
+      text.on("pointerdown", () => this.loadGame(slot));
     });
   }
 

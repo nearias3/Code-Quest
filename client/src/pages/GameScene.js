@@ -1,13 +1,13 @@
 import Phaser from "phaser";
-import { loginUser } from "../utils/authService";
-import { signupUser } from "../utils/authService";
+import { loginUser, signupUser } from "../utils/authService";
 
 
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: "GameScene" });
-    this.username = "";
-    this.password = "";
+    this.isLoggedIn = false;
+    this.isGameInProgress = false; // Track if the game is in progress
+    this.form = null; // Initialize form as null
   }
 
   preload() {
@@ -17,6 +17,24 @@ class GameScene extends Phaser.Scene {
 
   create() {
     console.log("GameScene: create");
+    // Check if user is logged in via token
+    this.checkLoginStatus();
+    this.displayMainMenu();
+    this.form = null; // form reference to clear it later after signup/login
+  }
+
+  checkLoginStatus() {
+    const token = localStorage.getItem("token");
+    this.isLoggedIn = !!token;
+  }
+
+  displayMainMenu() {
+    // Re-check login status whenever the main menu gets displayed again
+    this.checkLoginStatus();
+
+    // Clear any previous menu items
+    this.children.removeAll();
+
     this.add
       .text(400, 100, "Wizard's Apprentice: Pieces of the Master", {
         fontSize: "28px",
@@ -24,74 +42,70 @@ class GameScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Menu options
-    this.menuOptions = [
-      { text: "New Game", action: () => this.startNewGame() },
-      { text: "Load Game", action: this.loadGame.bind(this) },
-      { text: "Login", action: this.showLoginForm.bind(this) },
-      { text: "Settings", action: this.openSettings.bind(this) },
-      { text: "Exit", action: this.exitGame.bind(this) },
+    // Menu options, show New Game and Settings regardless of if LoggedIn or not
+    const menuOptions = [
+      { 
+        text: "New Game", 
+        action: this.startNewGame.bind(this) 
+      },
+      {
+        text: this.isLoggedIn ? "Load Game" : "Login",
+        action: this.isLoggedIn
+          ? this.showLoadSlots.bind(this)
+          : this.showLoginForm.bind(this),
+      },
     ];
 
-    // Create menu text objects and set them interactive
-    this.menuText = this.menuOptions.map((option, index) => {
+      // Add "Save Game" option if the user is logged in
+      if (this.isLoggedIn) {
+        menuOptions.push({
+          text: "Save Game",
+          action: this.saveGame.bind(this),
+        });
+
+        menuOptions.push({ 
+          text: "Settings",
+          action: this.openSettings.bind(this),
+        });
+        menuOptions.push({
+          text: "Logout",
+          action: this.logout.bind(this),
+        });
+      } else {
+        // If not logged in, add "Sign Up" option
+        menuOptions.push({
+          text: "Settings",
+          action: this.openSettings.bind(this),
+        });
+        menuOptions.push({
+          text: "Sign Up",
+          action: this.showSignupForm.bind(this),
+        });
+      }
+
+    // Create interactive menu items
+    menuOptions.forEach((option, index) => {
       const text = this.add
         .text(400, 200 + index * 50, option.text, {
           fontSize: "24px",
           fill: "#fff",
         })
         .setOrigin(0.5)
-        .setInteractive(); // Make the text interactive
+        .setInteractive();
 
-      // Add hover events
-      text.on("pointerover", () => {
-        text.setFill("#ff0"); // Highlight on hover
-      });
-
-      text.on("pointerout", () => {
-        text.setFill("#fff"); // Remove highlight
-      });
-
-      // Add left click event
-      text.on("pointerdown", () => option.action()); // Call the associated action
-      return text;
+      // Add hover and click events
+      text.on("pointerover", () => text.setFill("#ff0"));
+      text.on("pointerout", () => text.setFill("#fff"));
+      text.on("pointerdown", option.action);
     });
-
-    // Add full-screen button
-    this.fullscreenButton = this.add
-      .text(750, 550, "[]", { fontSize: "24px", fill: "#fff" }) // Use brackets for the button
-      .setOrigin(0.5)
-      .setInteractive()
-      .setPadding(5);
-
-    this.fullscreenButton.on("pointerover", () => {
-      this.fullscreenButton.setFill("#ff0"); // Highlight on hover
-    });
-
-    this.fullscreenButton.on("pointerout", () => {
-      this.fullscreenButton.setFill("#fff"); // Remove highlight
-    });
-
-    this.fullscreenButton.on("pointerdown", () => {
-      this.toggleFullscreen(); // Toggle fullscreen
-    });
-  }
-
-  toggleFullscreen() {
-    const canvas = this.game.canvas;
-
-    if (!document.fullscreenElement) {
-      canvas.requestFullscreen();
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
   }
 
   showLoginForm() {
+    // Clear the current menu content
+    this.children.removeAll();
+
     // Add a form to contain the login inputs and button
-    const loginForm = this.add.dom(400, 250).createFromHTML(`
+    this.form = this.add.dom(400, 250).createFromHTML(`
     <form id="login-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
       <input type="text" placeholder="Username" id="username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
       <input type="password" placeholder="Password" id="password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
@@ -102,9 +116,8 @@ class GameScene extends Phaser.Scene {
   `);
 
     // Add form submit event listener
-    loginForm.addListener("submit").on("submit", (event) => {
+    this.form.addListener("submit").on("submit", (event) => {
       event.preventDefault(); // Prevent page refresh
-      console.log("Login form submitted");
 
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
@@ -112,87 +125,29 @@ class GameScene extends Phaser.Scene {
       this.attemptLogin(username, password); // Trigger login attempt
     });
 
-    // Handle the "Sign up" link click to show signup form
-    const signupLink = document.getElementById("signup-link");
-    signupLink.addEventListener("click", (event) => {
-      event.preventDefault(); // Prevent page refresh
-      this.showSignupForm(); // Switch to the signup form
-    });
-  }
-
-  showSignupForm() {
-    // Add a signup form
-    const signupForm = this.add.dom(400, 250).createFromHTML(`
-    <form id="signup-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
-      <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
-      <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
-      <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px; border: none;">
-      <button type="submit" id="signup-btn" style="padding: 10px 20px; border-radius: 5px; background-color: #ffbf00; color: #000; border: none;">Sign Up</button>
-      <p style="margin-top: 10px; color: #fff;">Already have an account? <a href="#" id="login-link" style="color: #ffbf00; cursor: pointer;">Log in here</a></p>
-    </form>
-  `);
-
-    // Handle form submit for signup
-    signupForm.addListener("submit").on("submit", (event) => {
-      event.preventDefault(); // Prevent page refresh
-      const username = document.getElementById("signup-username").value;
-      const email = document.getElementById("signup-email").value;
-      const password = document.getElementById("signup-password").value;
-
-      this.attemptSignup(username, email, password); // Trigger signup attempt
-    });
-
-    // Handle the "Log in" link click to show login form again
-    const loginLink = document.getElementById("login-link");
-    loginLink.addEventListener("click", (event) => {
-      event.preventDefault(); // Prevent page refresh
-      this.showLoginForm(); // Switch back to the login form
-    });
-  }
-
-  // Singup attempt
-  async attemptSignup(username, email, password) {
-    try {
-      const response = await signupUser(username, email, password);
-
-      console.log("Signup response:", response); // Ensure we are logging the actual response
-
-      // Check if response and data exist
-      if (response && response.signup && response.signup.token) {
-        // On successful signup
-        localStorage.setItem("token", response.signup.token);
-        console.log("Signup successful, token stored.");
-        this.scene.start("WorldMapScene"); // Start the game after successful signup
-      } else {
-        throw new Error("Signup failed. Please try again.");
-      }
-    } catch (error) {
-      console.error("Signup failed", error);
-      this.add
-        .text(400, 400, "Signup failed. Please try again.", {
-          fontSize: "18px",
-          fill: "#ff0000",
-        })
-        .setOrigin(0.5);
-    }
+    // Handle "Sign Up" link to switch to sign up form
+    document
+      .getElementById("signup-link")
+      .addEventListener("click", (event) => {
+        event.preventDefault();
+        this.showSignupForm(); // Replace login with signup form
+      });
   }
 
   async attemptLogin(username, password) {
     try {
       const response = await loginUser(username, password);
-
-      // Log the full response to inspect its structure
       console.log("Login response:", response);
 
       if (response && response.login && response.login.token) {
-        // On successful login
         localStorage.setItem("token", response.login.token);
+        this.isLoggedIn = true; // Mark the user as logged in
         console.log("Login successful, token stored.");
 
-        // Emit the login event so React can respond
-        this.events.emit("loginEvent");
+        // Remove the form
+        this.form.destroy();
 
-        this.scene.start("WorldMapScene"); // Start the game after successful login
+        this.displayMainMenu(); // Go back to the main menu
       } else {
         throw new Error("Login failed. Please try again.");
       }
@@ -207,34 +162,205 @@ class GameScene extends Phaser.Scene {
     }
   }
 
-  startNewGame() {
-    console.log("Start New Game clicked!");
-    this.scene.start("WorldMapScene"); // Start the game
+  // Signup method
+  async attemptSignup(username, email, password) {
+    try {
+      const response = await signupUser(username, email, password);
+      console.log("Signup response:", response);
+
+      if (response && response.signup && response.signup.token) {
+        localStorage.setItem("token", response.signup.token);
+        this.isLoggedIn = true; // User is now signed up and logged in
+        console.log("Signup successful, token stored.");
+
+        // Remove the form
+        this.form.destroy();
+
+        this.displayMainMenu(); // Return to main menu
+      } else {
+        throw new Error("Signup failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Signup failed:", error);
+      this.add
+        .text(400, 400, "Signup failed. Please try again.", {
+          fontSize: "18px",
+          fill: "#ff0000",
+        })
+        .setOrigin(0.5);
+    }
   }
 
-  loadGame() {
-    console.log("Load Game clicked!");
-    // Implement load game functionality
+  logout() {
+    localStorage.removeItem("token");
+    this.isLoggedIn = false; // Mark the user as logged out
+    console.log("Logged out");
+    this.displayMainMenu(); // Refresh the menu after logging out
+  }
+
+  // New Game logic
+  startNewGame() {
+    console.log("Start New Game clicked!");
+    this.scene.start("WorldMapScene");
+  }
+
+  // Signup form logic
+  showSignupForm() {
+    // Clear the current menu content
+    this.children.removeAll();
+
+    this.form = this.add.dom(400, 250).createFromHTML(`
+      <form id="signup-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
+        <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
+      </form>
+    `);
+
+    this.form.addListener("submit").on("submit", (event) => {
+      event.preventDefault();
+      const username = document.getElementById("signup-username").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      this.attemptSignup(username, email, password);
+    });
+  }
+
+  async saveGame() {
+    console.log("Save Game clicked!");
+
+    // Clear current menu items
+    this.children.removeAll();
+
+    // Display save slot options
+    this.add
+      .text(400, 100, "Choose a Save Slot:", { fontSize: "28px", fill: "#fff" })
+      .setOrigin(0.5);
+
+    // Create save slot buttons
+    const saveSlots = [1, 2, 3];
+    saveSlots.forEach((slot, index) => {
+      const text = this.add
+        .text(400, 200 + index * 50, `Save Slot ${slot}`, {
+          fontSize: "24px",
+          fill: "#fff",
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+      // When the slot is clicked, trigger the actual save function
+      text.on("pointerover", () => text.setFill("#ff0"));
+      text.on("pointerout", () => text.setFill("#fff"));
+      text.on("pointerdown", () => this.performSave(slot)); // Save to the selected slot
+    });
+  }
+
+  // Perform save in the selected slot
+  async performSave(slotNumber) {
+    console.log(`Saving game to slot ${slotNumber}...`);
+
+    // Mockup: Replace this actual game data (e.g., player stats, progress)
+    const playerStats = {
+      level: 5,
+      health: 100,
+      mana: 50,
+    };
+
+    const progress = {
+      currentStage: "WorldMap",
+      completedQuests: ["Placeholder Quest 1", "Placeholder Quest 2"],
+    };
+
+    try {
+      // Replace this with actual API function for saving the game once we build that
+      const response = await fetch("http://localhost:4000/api/save-game", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          slotNumber,
+          playerStats,
+          progress,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log("Game saved successfully to slot ${slotNumber}:", result);
+        this.add
+          .text(400, 400, "Game Saved!", {
+            fontSize: "18px",
+            fill: "#00ff00",
+          })
+          .setOrigin(0.5);
+      } else {
+        throw new Error(result.message || "Failed to save game.");
+      }
+    } catch (error) {
+      console.error("Save Game failed:", error);
+      this.add
+        .text(400, 400, "Failed to Save Game", {
+          fontSize: "18px",
+          fill: "#ff0000",
+        })
+        .setOrigin(0.5);
+    }
   }
 
   openSettings() {
     console.log("Settings clicked!");
-    // Implement settings functionality
+    // Any settings functionalities should be implemented here!!
   }
 
-  exitGame() {
-    console.log("Exit clicked!");
-    // Implement exit game functionality
+  // Load game slots
+  showLoadSlots() {
+    this.children.removeAll(); // Clear menu items
+
+    // Display load slot options
+      this.add
+        .text(400, 100, "Choose a Load Slot:", {
+          fontSize: "28px",
+          fill: "#fff",
+        })
+        .setOrigin(0.5);
+
+    // Create load slot buttons
+    const loadSlots = [1, 2, 3]; 
+    loadSlots.forEach((slot, index) => {
+      const text =
+      this.add
+        .text(400, 300 + index * 50, `Load Slot ${slot}`, { fill: "#fff" })
+        .setOrigin(0.5)
+        .setInteractive();
+
+      // When the slot is clicked, trigger the actual load function
+      text.on("pointerover", () => text.setFill("#ff0"));
+      text.on("pointerout", () => text.setFill("#fff"));
+      text.on("pointerdown", () => this.loadGame(slot));
+    });
   }
 
-  update() {
-    // Game loop logic (if any)
+  // Load game method
+  loadGame(slotNumber) {
+    console.log(`Load game from slot ${slotNumber}`);
+    // Fetch data from the server, then start the game scene
+    this.scene.start("WorldMapScene"); // Example for now
+  }
+
+  // Return to main menu option from inside the game
+  returnToMainMenu() {
+    this.scene.start("GameScene");
   }
 }
 
 class WorldMapScene extends Phaser.Scene {
   constructor() {
     super({ key: "WorldMapScene" });
+    this.isPaused = false; // Track if the game is paused
   }
 
   preload() {
@@ -250,6 +376,7 @@ class WorldMapScene extends Phaser.Scene {
   }
 
   create() {
+    // Create the game world
     const mapImage = this.add.image(400, 300, "placeholderWorldMap");
     mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 
@@ -257,6 +384,7 @@ class WorldMapScene extends Phaser.Scene {
       .text(400, 50, "Dimension of Magic", { fontSize: "32px", fill: "#fff" })
       .setOrigin(0.5);
 
+    // Create the player
     this.createPlayer();
 
     // Create the door
@@ -276,12 +404,19 @@ class WorldMapScene extends Phaser.Scene {
       s: Phaser.Input.Keyboard.KeyCodes.S,
       d: Phaser.Input.Keyboard.KeyCodes.D,
     });
+
+    // Create input events for keys - hitting enter will pause the game and bring up the menu
+    this.enterKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ENTER
+    );
+
+    this.menuOpen = false; // Track menu state
   }
 
   createPlayer() {
     this.player = this.physics.add.sprite(400, 300, "placeholderCharacter");
     this.player.setCollideWorldBounds(true);
-    const scaleFactor = 0.1; // Adjust size
+    const scaleFactor = 0.1;
     this.player.setDisplaySize(
       this.player.width * scaleFactor,
       this.player.height * scaleFactor
@@ -289,8 +424,16 @@ class WorldMapScene extends Phaser.Scene {
   }
 
   update() {
-    this.handlePlayerMovement();
-    this.checkDoorInteraction();
+    // Check if user has pressed ENTER key to toggle pause menu
+    if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+      this.togglePauseMenu();
+    }
+
+    if (!this.isPaused) {
+      // Handles movement and door interactivity if the game is NOT paused
+      this.handlePlayerMovement();
+      this.checkDoorInteraction();
+    }
   }
 
   handlePlayerMovement() {
@@ -309,6 +452,109 @@ class WorldMapScene extends Phaser.Scene {
     } else {
       this.player.setVelocityY(0);
     }
+  }
+
+  // Toggle Pause Menu
+  togglePauseMenu() {
+    if (this.isPaused) {
+      this.resumeGame();
+    } else {
+      this.pauseGame();
+    }
+  }
+
+  // Display the pause menu
+  pauseGame() {
+    this.isPaused = true;
+    this.player.setVelocity(0, 0); // Stop player movement
+    this.showPauseMenu();
+  }
+
+  // Remove the pause menu and resume gameplay
+  resumeGame() {
+    this.isPaused = false;
+    this.menuOpen = false;
+    this.children.removeAll(); // Clear the menu UI
+    this.create(); // Redraw the game screen
+  }
+
+  // Show the pause menu UI
+  showPauseMenu() {
+    // Clear the game view to show the pause menu
+    this.children.removeAll();
+
+    // Display the Pause Menu Title
+    this.add
+      .text(400, 100, "Paused", {
+        fontSize: "32px",
+        fill: "#fff",
+      })
+      .setOrigin(0.5);
+
+    // Menu options
+    const menuOptions = [];
+
+    // Add "Continue Game" to the menu
+    menuOptions.push({
+      text: "Continue Game",
+      action: this.resumeGame.bind(this),
+    });
+
+    // Check login status to append regular menu options
+    if (localStorage.getItem("token")) {
+      // Add save, load, settings, and logout for logged-in users
+      menuOptions.push({
+        text: "Save Game",
+        action: this.saveGame.bind(this), // Trigger save directly from the pause menu
+      });
+
+      menuOptions.push({
+        text: "Load Game",
+        action: this.showLoadSlots.bind(this), // Trigger load game directly
+      });
+
+      menuOptions.push({
+        text: "Settings",
+        action: this.openSettings.bind(this), // Open settings menu
+      });
+
+      menuOptions.push({
+        text: "Logout",
+        action: this.logout.bind(this), // Directly log out
+      });
+    } else {
+      // Add login and signup for non-logged-in users
+      menuOptions.push({
+        text: "Login",
+        action: this.showLoginForm.bind(this), // Open login form directly
+      });
+
+      menuOptions.push({
+        text: "Sign Up",
+        action: this.showSignupForm.bind(this), // Open signup form directly
+      });
+
+      menuOptions.push({
+        text: "Settings",
+        action: this.openSettings.bind(this), // Open settings menu
+      });
+    }
+
+    // Create interactive menu items
+    menuOptions.forEach((option, index) => {
+      const text = this.add
+        .text(400, 200 + index * 50, option.text, {
+          fontSize: "24px",
+          fill: "#fff",
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+      // Add hover and click events
+      text.on("pointerover", () => text.setFill("#ff0"));
+      text.on("pointerout", () => text.setFill("#fff"));
+      text.on("pointerdown", option.action); // Trigger action directly from the pause menu
+    });
   }
 
   checkDoorInteraction() {

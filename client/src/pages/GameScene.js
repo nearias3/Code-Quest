@@ -326,6 +326,96 @@ class GameScene extends Phaser.Scene {
       player.setVelocityX(-160);
     } else if (cursors.d.isDown) {
       player.setVelocityX(160);
+  // Return to main menu option from inside the game
+  returnToMainMenu() {
+    this.scene.start("GameScene");
+  }
+}
+
+class WorldMapScene extends Phaser.Scene {
+  constructor() {
+    super({ key: "WorldMapScene" });
+    this.isPaused = false; // Track if the game is paused
+  }
+
+  preload() {
+    this.load.image(
+      "placeholderWorldMap",
+      "src/assets/placeholderWorldMap.png"
+    );
+    this.load.image(
+      "placeholderCharacter",
+      "src/assets/placeholderCharacter.png"
+    );
+    this.load.image("door", "src/assets/door.png");
+  }
+
+  create() {
+    // Create the game world
+    const mapImage = this.add.image(400, 300, "placeholderWorldMap");
+    mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+
+    this.add
+      .text(400, 50, "Dimension of Magic", { fontSize: "32px", fill: "#fff" })
+      .setOrigin(0.5);
+
+    // Create the player
+    this.createPlayer();
+
+    // Create the door
+    this.door = this.add.rectangle(750, 410, 25, 50, 0xff0000).setOrigin(-1.5);
+    this.battleZone = this.add
+      .zone(500, 300, 100, 100)
+      .setOrigin(0)
+      .setInteractive();
+
+    this.battleZone.on("pointerdown", () => {
+      this.scene.start("BattleScene");
+    });
+
+    this.cursors = this.input.keyboard.addKeys({
+      w: Phaser.Input.Keyboard.KeyCodes.W,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      s: Phaser.Input.Keyboard.KeyCodes.S,
+      d: Phaser.Input.Keyboard.KeyCodes.D,
+    });
+
+    // Create input events for keys - hitting enter will pause the game and bring up the menu
+    this.enterKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.ENTER
+    );
+
+    this.menuOpen = false; // Track menu state
+  }
+
+  createPlayer() {
+    this.player = this.physics.add.sprite(275, 100, "placeholderCharacter");
+    this.player.setCollideWorldBounds(true);
+    const scaleFactor = 0.1;
+    this.player.setDisplaySize(
+      this.player.width * scaleFactor,
+      this.player.height * scaleFactor
+    );
+  }
+
+  update() {
+    // Check if user has pressed ENTER key to toggle pause menu
+    if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+      this.togglePauseMenu();
+    }
+
+    if (!this.isPaused) {
+      // Handles movement and door interactivity if the game is NOT paused
+      this.handlePlayerMovement();
+      this.checkDoorInteraction();
+    }
+  }
+
+  handlePlayerMovement() {
+    if (this.cursors.a.isDown) {
+      this.player.setVelocityX(-160);
+    } else if (this.cursors.d.isDown) {
+      this.player.setVelocityX(160);
     } else {
       player.setVelocityX(0);
     }
@@ -340,5 +430,396 @@ class GameScene extends Phaser.Scene {
   }
 }
 
+
+  // Toggle Pause Menu
+  togglePauseMenu() {
+    if (this.isPaused) {
+      this.resumeGame();
+    } else {
+      this.pauseGame();
+    }
+  }
+
+  // Display the pause menu
+  pauseGame() {
+    this.isPaused = true;
+    this.player.setVelocity(0, 0); // Stop player movement
+    this.showPauseMenu();
+  }
+
+  // Remove the pause menu and resume gameplay
+  resumeGame() {
+    this.isPaused = false;
+    this.menuOpen = false;
+    this.children.removeAll(); // Clear the menu UI
+    this.create(); // Redraw the game screen
+  }
+
+  // Show the pause menu UI
+  showPauseMenu() {
+    // Clear the game view to show the pause menu
+    this.children.removeAll();
+
+    // Display the Pause Menu Title
+    this.add
+      .text(400, 100, "Paused", {
+        fontSize: "32px",
+        fill: "#fff",
+      })
+      .setOrigin(0.5);
+
+    // Menu options
+    const menuOptions = [];
+
+    // Add "Continue Game" to the menu
+    menuOptions.push({
+      text: "Continue Game",
+      action: this.resumeGame.bind(this),
+    });
+
+    // Check login status to append regular menu options
+    if (localStorage.getItem("token")) {
+      // Add save, load, settings, and logout for logged-in users
+      menuOptions.push({
+        text: "Save Game",
+        action: this.saveGame.bind(this), // Trigger save directly from the pause menu
+      });
+
+      menuOptions.push({
+        text: "Load Game",
+        action: this.showLoadSlots.bind(this), // Trigger load game directly
+      });
+
+      menuOptions.push({
+        text: "Settings",
+        action: this.openSettings.bind(this), // Open settings menu
+      });
+
+      menuOptions.push({
+        text: "Logout",
+        action: this.logout.bind(this), // Directly log out
+      });
+    } else {
+      // Add login and signup for non-logged-in users
+      menuOptions.push({
+        text: "Login",
+        action: this.showLoginForm.bind(this), // Open login form directly
+      });
+
+      menuOptions.push({
+        text: "Sign Up",
+        action: this.showSignupForm.bind(this), // Open signup form directly
+      });
+
+      menuOptions.push({
+        text: "Settings",
+        action: this.openSettings.bind(this), // Open settings menu
+      });
+    }
+
+    // Create interactive menu items
+    menuOptions.forEach((option, index) => {
+      const text = this.add
+        .text(400, 200 + index * 50, option.text, {
+          fontSize: "24px",
+          fill: "#fff",
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+      // Add hover and click events
+      text.on("pointerover", () => text.setFill("#ff0"));
+      text.on("pointerout", () => text.setFill("#fff"));
+      text.on("pointerdown", option.action); // Trigger action directly from the pause menu
+    });
+  }
+
+  checkDoorInteraction() {
+    const doorBounds = this.door.getBounds();
+    const playerBounds = this.player.getBounds();
+
+    if (Phaser.Geom.Intersects.RectangleToRectangle(doorBounds, playerBounds)) {
+      this.scene.start("Map1Scene");
+    }
+  }
+}
+
+class Map1Scene extends Phaser.Scene {
+  constructor() {
+    super({ key: "Map1Scene" });
+  }
+
+  preload() {
+    this.load.image(
+      "placeholderMap1Scene",
+      "src/assets/placeholderMap1Scene.png"
+    );
+    this.load.image(
+      "placeholderCharacter",
+      "src/assets/placeholderCharacter.png"
+    );
+    this.load.image("door", "src/assets/door.png");
+  }
+
+  create() {
+    const mapImage = this.add.image(400, 300, "placeholderMap1Scene");
+    mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+
+    this.createPlayer();
+
+    // Create the door
+    this.door = this.add.rectangle(750, 425, 25, 50, 0xff0000).setOrigin(-1.5);
+    this.battleZone = this.add
+      .zone(500, 300, 100, 100)
+      .setOrigin(0)
+      .setInteractive();
+
+    this.battleZone.on("pointerdown", () => {
+      this.scene.start("BattleScene");
+    });
+
+    this.cursors = this.input.keyboard.addKeys({
+      w: Phaser.Input.Keyboard.KeyCodes.W,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      s: Phaser.Input.Keyboard.KeyCodes.S,
+      d: Phaser.Input.Keyboard.KeyCodes.D,
+    });
+  }
+
+  createPlayer() {
+    this.player = this.physics.add.sprite(325, 140, "placeholderCharacter");
+    this.player.setCollideWorldBounds(true);
+    const scaleFactor = 0.1; // Adjust size
+    this.player.setDisplaySize(
+      this.player.width * scaleFactor,
+      this.player.height * scaleFactor
+    );
+  }
+
+  update() {
+    this.handlePlayerMovement();
+    this.checkDoorInteraction();
+  }
+
+  handlePlayerMovement() {
+    if (this.cursors.a.isDown) {
+      this.player.setVelocityX(-160);
+    } else if (this.cursors.d.isDown) {
+      this.player.setVelocityX(160);
+    } else {
+      this.player.setVelocityX(0);
+    }
+
+    if (this.cursors.w.isDown) {
+      this.player.setVelocityY(-160);
+    } else if (this.cursors.s.isDown) {
+      this.player.setVelocityY(160);
+    } else {
+      this.player.setVelocityY(0);
+    }
+  }
+
+  checkDoorInteraction() {
+    const doorBounds = this.door.getBounds();
+    const playerBounds = this.player.getBounds();
+
+    if (Phaser.Geom.Intersects.RectangleToRectangle(doorBounds, playerBounds)) {
+      this.scene.start("Map2Scene");
+    }
+  }
+}
+
+class Map2Scene extends Phaser.Scene {
+  constructor() {
+    super({ key: "Map2Scene" });
+  }
+
+  preload() {
+    this.load.image(
+      "placeholderMap2Scene",
+      "src/assets/placeholderMap2Scene.png"
+    );
+    this.load.image(
+      "placeholderCharacter",
+      "src/assets/placeholderCharacter.png"
+    );
+    this.load.image("door", "src/assets/door.png");
+  }
+
+  create() {
+    const mapImage = this.add.image(400, 300, "placeholderMap2Scene");
+    mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+
+    this.createPlayer();
+
+    // Create the door
+    this.door = this.add.rectangle(750, 375, 25, 50, 0xff0000).setOrigin(-1.5);
+    this.battleZone = this.add
+      .zone(500, 300, 100, 100)
+      .setOrigin(0)
+      .setInteractive();
+
+    this.battleZone.on("pointerdown", () => {
+      this.scene.start("BattleScene");
+    });
+
+    this.cursors = this.input.keyboard.addKeys({
+      w: Phaser.Input.Keyboard.KeyCodes.W,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      s: Phaser.Input.Keyboard.KeyCodes.S,
+      d: Phaser.Input.Keyboard.KeyCodes.D,
+    });
+  }
+
+  createPlayer() {
+    this.player = this.physics.add.sprite(25, 375, "placeholderCharacter");
+    this.player.setCollideWorldBounds(true);
+    const scaleFactor = 0.1; // Adjust size
+    this.player.setDisplaySize(
+      this.player.width * scaleFactor,
+      this.player.height * scaleFactor
+    );
+  }
+
+  update() {
+    this.handlePlayerMovement();
+    this.checkDoorInteraction();
+  }
+
+  handlePlayerMovement() {
+    if (this.cursors.a.isDown) {
+      this.player.setVelocityX(-160);
+    } else if (this.cursors.d.isDown) {
+      this.player.setVelocityX(160);
+    } else {
+      this.player.setVelocityX(0);
+    }
+
+    if (this.cursors.w.isDown) {
+      this.player.setVelocityY(-160);
+    } else if (this.cursors.s.isDown) {
+      this.player.setVelocityY(160);
+    } else {
+      this.player.setVelocityY(0);
+    }
+  }
+
+  checkDoorInteraction() {
+    const doorBounds = this.door.getBounds();
+    const playerBounds = this.player.getBounds();
+
+    if (Phaser.Geom.Intersects.RectangleToRectangle(doorBounds, playerBounds)) {
+      this.scene.start("Map3Scene");
+    }
+  }
+}
+
+class Map3Scene extends Phaser.Scene {
+  constructor() {
+    super({ key: "Map3Scene" });
+  }
+
+  preload() {
+    this.load.image(
+      "placeholderMap3Scene",
+      "src/assets/placeholderMap3Scene.png"
+    );
+    this.load.image(
+      "placeholderCharacter",
+      "src/assets/placeholderCharacter.png"
+    );
+    this.load.image("door", "src/assets/door.png");
+  }
+
+  create() {
+    const mapImage = this.add.image(400, 300, "placeholderMap3Scene");
+    mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+
+    this.createPlayer();
+
+    // Create the door
+    this.door = this.add.rectangle(750, 400, 25, 50, 0xff0000).setOrigin(-1.5);
+    this.battleZone = this.add
+      .zone(500, 300, 100, 100)
+      .setOrigin(0)
+      .setInteractive();
+
+    this.battleZone.on("pointerdown", () => {
+      this.scene.start("BattleScene");
+    });
+
+    this.cursors = this.input.keyboard.addKeys({
+      w: Phaser.Input.Keyboard.KeyCodes.W,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      s: Phaser.Input.Keyboard.KeyCodes.S,
+      d: Phaser.Input.Keyboard.KeyCodes.D,
+    });
+  }
+
+  createPlayer() {
+    this.player = this.physics.add.sprite(25, 200, "placeholderCharacter");
+    this.player.setCollideWorldBounds(true);
+    const scaleFactor = 0.1; // Adjust size
+    this.player.setDisplaySize(
+      this.player.width * scaleFactor,
+      this.player.height * scaleFactor
+    );
+  }
+
+  update() {
+    this.handlePlayerMovement();
+    this.checkDoorInteraction();
+  }
+
+  handlePlayerMovement() {
+    if (this.cursors.a.isDown) {
+      this.player.setVelocityX(-160);
+    } else if (this.cursors.d.isDown) {
+      this.player.setVelocityX(160);
+    } else {
+      this.player.setVelocityX(0);
+    }
+
+    if (this.cursors.w.isDown) {
+      this.player.setVelocityY(-160);
+    } else if (this.cursors.s.isDown) {
+      this.player.setVelocityY(160);
+    } else {
+      this.player.setVelocityY(0);
+    }
+  }
+
+  checkDoorInteraction() {
+    const doorBounds = this.door.getBounds();
+    const playerBounds = this.player.getBounds();
+
+    if (Phaser.Geom.Intersects.RectangleToRectangle(doorBounds, playerBounds)) {
+      this.scene.start("WorldMapScene");
+    }
+  }
+}
+
+class BattleScene extends Phaser.Scene {
+  constructor() {
+    super({ key: "BattleScene" });
+  }
+
+  preload() {
+    // Load battle assets
+  }
+
+  create() {
+    this.add
+      .text(400, 300, "Battle Scene", { fontSize: "32px", fill: "#fff" })
+      .setOrigin(0.5);
+    // Setup battle mechanics
+  }
+
+  update() {
+    // Handle battle logic
+  }
+}
+
+export { GameScene, WorldMapScene, BattleScene, Map1Scene, Map2Scene, Map3Scene };
 export default GameScene;
   

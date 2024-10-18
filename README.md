@@ -1,1 +1,1 @@
-# Code-Quest
+# Wizard's Apprentice

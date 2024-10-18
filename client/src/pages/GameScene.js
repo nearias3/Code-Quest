@@ -388,7 +388,7 @@ class WorldMapScene extends Phaser.Scene {
     this.createPlayer();
 
     // Create the door
-    this.door = this.add.rectangle(700, 300, 50, 100, 0xff0000).setOrigin(-1.5);
+    this.door = this.add.rectangle(750, 410, 25, 50, 0xff0000).setOrigin(-1.5);
     this.battleZone = this.add
       .zone(500, 300, 100, 100)
       .setOrigin(0)
@@ -414,7 +414,7 @@ class WorldMapScene extends Phaser.Scene {
   }
 
   createPlayer() {
-    this.player = this.physics.add.sprite(400, 300, "placeholderCharacter");
+    this.player = this.physics.add.sprite(275, 100, "placeholderCharacter");
     this.player.setCollideWorldBounds(true);
     const scaleFactor = 0.1;
     this.player.setDisplaySize(
@@ -591,7 +591,7 @@ class Map1Scene extends Phaser.Scene {
     this.createPlayer();
 
     // Create the door
-    this.door = this.add.rectangle(700, 300, 50, 100, 0xff0000).setOrigin(-1.5);
+    this.door = this.add.rectangle(750, 425, 25, 50, 0xff0000).setOrigin(-1.5);
     this.battleZone = this.add
       .zone(500, 300, 100, 100)
       .setOrigin(0)
@@ -610,7 +610,7 @@ class Map1Scene extends Phaser.Scene {
   }
 
   createPlayer() {
-    this.player = this.physics.add.sprite(400, 300, "placeholderCharacter");
+    this.player = this.physics.add.sprite(325, 140, "placeholderCharacter");
     this.player.setCollideWorldBounds(true);
     const scaleFactor = 0.1; // Adjust size
     this.player.setDisplaySize(
@@ -676,7 +676,7 @@ class Map2Scene extends Phaser.Scene {
     this.createPlayer();
 
     // Create the door
-    this.door = this.add.rectangle(700, 300, 50, 100, 0xff0000).setOrigin(-1.5);
+    this.door = this.add.rectangle(750, 375, 25, 50, 0xff0000).setOrigin(-1.5);
     this.battleZone = this.add
       .zone(500, 300, 100, 100)
       .setOrigin(0)
@@ -695,7 +695,7 @@ class Map2Scene extends Phaser.Scene {
   }
 
   createPlayer() {
-    this.player = this.physics.add.sprite(400, 300, "placeholderCharacter");
+    this.player = this.physics.add.sprite(25, 375, "placeholderCharacter");
     this.player.setCollideWorldBounds(true);
     const scaleFactor = 0.1; // Adjust size
     this.player.setDisplaySize(
@@ -761,7 +761,7 @@ class Map3Scene extends Phaser.Scene {
     this.createPlayer();
 
     // Create the door
-    this.door = this.add.rectangle(700, 300, 50, 100, 0xff0000).setOrigin(-1.5);
+    this.door = this.add.rectangle(750, 400, 25, 50, 0xff0000).setOrigin(-1.5);
     this.battleZone = this.add
       .zone(500, 300, 100, 100)
       .setOrigin(0)
@@ -780,7 +780,7 @@ class Map3Scene extends Phaser.Scene {
   }
 
   createPlayer() {
-    this.player = this.physics.add.sprite(400, 300, "placeholderCharacter");
+    this.player = this.physics.add.sprite(25, 200, "placeholderCharacter");
     this.player.setCollideWorldBounds(true);
     const scaleFactor = 0.1; // Adjust size
     this.player.setDisplaySize(

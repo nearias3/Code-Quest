@@ -39,7 +39,6 @@ async function startServer() {
     const { slotNumber, playerStats, progress } = req.body;
 
     try {
-
       // Saves game to the specified slot (1, 2, or 3)
       const saveSlot = await SaveSlot.findOneAndUpdate(
         { userId: user._id, slotNumber },
@@ -78,8 +77,31 @@ async function startServer() {
     }
   });
 
+  // Route to load the game (GET request with slotNumber in the URL)
+  app.get("/api/load-game/:slotNumber", async (req, res) => {
+    const user = authMiddleware(req);
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-// Connect to the server
+    const { slotNumber } = req.params; // Get slotNumber from the URL
+
+    try {
+      const saveSlot = await SaveSlot.findOne({ userId: user._id, slotNumber });
+      if (!saveSlot) {
+        return res
+          .status(404)
+          .json({ message: "No save found for this slot." });
+      }
+
+      res.json(saveSlot); // Return the saved data
+    } catch (error) {
+      console.error("Error loading game:", error);
+      res.status(500).json({ message: "Failed to load game", error });
+    }
+  });
+
+  // Connect to the server
   app.use(
     "/graphql",
     expressMiddleware(server, {

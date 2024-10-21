@@ -1,13 +1,11 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
-import {
-  GameScene,
-  WorldMapScene,
-  BattleScene,
-  Map1Scene,
-  Map2Scene,
-  Map3Scene,
-} from "../pages/GameScene.js";
+import GameScene from "../pages/GameScene";
+import WorldMapScene from "../pages/WorldMapScene";
+import BattleScene from "../pages/BattleScene";
+import Map1Scene from "../pages/Map1Scene";
+import Map2Scene from "../pages/Map2Scene";
+import Map3Scene from "../pages/Map3Scene";
 import PropTypes from "prop-types";
 
 const GameArea = ({ onLogin }) => {
@@ -37,14 +35,6 @@ const GameArea = ({ onLogin }) => {
 
     const game = new Phaser.Game(config);
 
-    // Once GameScene is loaded, listen for the login event
-    const gameScene = game.scene.keys["GameScene"];
-    if (gameScene) {
-      gameScene.events.on("loginEvent", () => {
-        console.log("Login event triggered in Phaser!");
-        onLogin(); // Trigger React login function
-      });
-    }
 
     return () => {
       game.destroy(true);

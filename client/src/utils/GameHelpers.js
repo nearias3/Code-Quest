@@ -119,6 +119,11 @@ const GameHelpers = {
   showSaveSlots(scene) {
     scene.pauseMenu.setVisible(false); // Hide the pause menu
 
+    // Add a background for the save slots menu
+    const saveBg = scene.add
+      .rectangle(400, 300, 600, 400, 0x000000, 0.7) // Semi-transparent black background
+      .setOrigin(0.5);
+
     // Display save slot options
     const saveText = scene.add
       .text(400, 100, "Choose a Save Slot:", { fontSize: "28px", fill: "#fff" })
@@ -156,6 +161,7 @@ const GameHelpers = {
     // When the back button is clicked, return to the pause menu
     backButton.on("pointerdown", () => {
       // Destroy save menu elements
+      saveBg.destroy(); // Remove background
       saveText.destroy(); // Remove "Choose a Save Slot" title
       saveSlotTexts.forEach((text) => text.destroy()); // Remove save slot options
       backButton.destroy(); // Remove back button

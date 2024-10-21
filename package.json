@@ -9,7 +9,7 @@
     "start-server": "cd server && nodemon server.js",
     "start-client": "cd client && npm start",
     "install-all": "npm install && cd client && npm install && cd ../server && npm install"
-},
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

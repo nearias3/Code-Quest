@@ -203,12 +203,18 @@ const GameHelpers = {
 
       if (response.ok) {
         console.log(`Game saved successfully to slot ${slotNumber}:`, result);
-        scene.add
-          .text(400, 400, "Game Saved!", {
+        const savedText = scene.add
+          .text(400, 350, "Game Saved!", {
             fontSize: "18px",
             fill: "#00ff00",
           })
           .setOrigin(0.5);
+
+        // Set a timer to remove the "Game Saved!" text after 3 seconds
+        scene.time.delayedCall(3000, () => {
+          savedText.destroy();
+        });
+
       } else {
         throw new Error(result.message || "Failed to save game.");
       }

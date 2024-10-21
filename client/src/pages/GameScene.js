@@ -17,6 +17,9 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
+    // Pass reference of `checkLoginStatus` to be used elsewhere
+    this.checkLoginStatus = this.checkLoginStatus.bind(this);
+    
     // Check if user is logged in via token
     this.checkLoginStatus();
 
@@ -195,6 +198,7 @@ class GameScene extends Phaser.Scene {
       text.on("pointerdown", () => this.performSave(slot)); // Save to the selected slot
     });
   }
+  
 
   // Perform save in the selected slot
   async performSave(slotNumber) {
@@ -249,6 +253,21 @@ class GameScene extends Phaser.Scene {
         })
         .setOrigin(0.5);
     }
+
+    // After saving (or failing), show the "Back to Menu" button
+    const backButton = this.add
+      .text(400, 450, "Back to Menu", {
+        fontSize: "24px",
+        fill: "#fff",
+      })
+      .setOrigin(0.5)
+      .setInteractive();
+
+    backButton.on("pointerover", () => backButton.setFill("#ff0"));
+    backButton.on("pointerout", () => backButton.setFill("#fff"));
+    backButton.on("pointerdown", () => {
+      GameHelpers.displayMainMenu(this); // Go back to the main menu
+    });
   }
 
   // Load game slots

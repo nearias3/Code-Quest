@@ -44,7 +44,10 @@ const GameHelpers = {
   },
 
   displayMainMenu(scene) {
-    scene.checkLoginStatus();
+    if (scene.checkLoginStatus) {
+      scene.checkLoginStatus();
+    }
+
     scene.children.removeAll(); // Clear menu items
 
     scene.add
@@ -114,14 +117,17 @@ const GameHelpers = {
 
   // Display the save slots menu
   showSaveSlots(scene) {
+    scene.pauseMenu.setVisible(false); // Hide the pause menu
     scene.children.removeAll(); // Clear menu items
 
     // Display save slot options
-    scene.add
+     const saveText = scene.add
       .text(400, 100, "Choose a Save Slot:", { fontSize: "28px", fill: "#fff" })
       .setOrigin(0.5);
 
     const saveSlots = [1, 2, 3];
+    const saveSlotTexts = [];
+
     saveSlots.forEach((slot, index) => {
       const text = scene.add
         .text(400, 200 + index * 50, `Save Slot ${slot}`, {
@@ -131,10 +137,28 @@ const GameHelpers = {
         .setOrigin(0.5)
         .setInteractive();
 
-      // When the slot is clicked, trigger the actual save function
-      text.on("pointerover", () => text.setFill("#ff0"));
-      text.on("pointerout", () => text.setFill("#fff"));
-      text.on("pointerdown", () => this.performSave(scene, slot)); // Save to the selected slot
+      // Save to the selected slot
+      text.on("pointerdown", () => this.performSave(scene, slot));
+      saveSlotTexts.push(text); // Track save slot texts for later removal
+    });
+
+    // Add the "Back" button to return to the menu after saving
+    const backButton = scene.add
+      .text(400, 400, "Back to Menu", {
+        fontSize: "24px",
+        fill: "#fff",
+      })
+      .setOrigin(0.5)
+      .setInteractive();
+
+    backButton.on("pointerover", () => backButton.setFill("#ff0"));
+    backButton.on("pointerout", () => backButton.setFill("#fff"));
+    // When the back button is clicked, return to the pause menu
+    backButton.on("pointerdown", () => {
+      saveText.destroy(); // Remove "Choose a Save Slot" title
+      saveSlotTexts.forEach((text) => text.destroy()); // Remove save slot options
+      backButton.destroy(); // Remove back button
+      scene.pauseMenu.setVisible(true); // Show the original pause menu
     });
   },
 
@@ -294,9 +318,9 @@ const GameHelpers = {
       additionalOptions = [loadText, saveText, settingsText];
 
       // Add interactivity for load and save game
-      loadText.on("pointerdown", () => scene.showLoadSlots(scene));
-      saveText.on("pointerdown", () => scene.showSaveSlots(scene));
-      settingsText.on("pointerdown", () => scene.openSettings(scene));
+      loadText.on("pointerdown", () => GameHelpers.showLoadSlots(scene));
+      saveText.on("pointerdown", () => GameHelpers.showSaveSlots(scene));
+      settingsText.on("pointerdown", () => GameHelpers.openSettings(scene));
     } else {
       // Not logged-in users get Login and Signup options
       const loginText = scene.add
@@ -356,7 +380,7 @@ const GameHelpers = {
   },
 
   openSettings(scene) {
-    // You could add your settings logic here, e.g., adjusting volume, controls, etc.
+    // Placeholder for settings logic
     console.log(scene);
   },
 };

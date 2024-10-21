@@ -9,6 +9,8 @@ const resolvers = require("./graphql/resolvers");
 const { authMiddleware, verifyToken } = require("./utils/auth");
 require("dotenv").config();
 
+const PORT = process.env.PORT || 4000;
+
 async function startServer() {
   const server = new ApolloServer({ typeDefs, resolvers });
 
@@ -121,12 +123,8 @@ async function startServer() {
       console.error("MongoDB connection error:", error);
     });
 
-  app.listen(process.env.PORT || 4000, () => {
-    console.log(
-      `Server is running at http://localhost:${
-        process.env.PORT || 4000
-      }/graphql`
-    );
+  app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}/graphql`);
   });
 
 }

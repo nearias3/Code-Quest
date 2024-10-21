@@ -10,12 +10,12 @@ class WorldMapScene extends Phaser.Scene {
   preload() {
     this.load.image(
       "placeholderWorldMap",
-      "public/assets/placeholderWorldMap.png"
+      "/assets/placeholderWorldMap.png"
     );
-    this.load.image("door", "src/assets/door.png");
+    this.load.image("door", "/assets/door.png");
     this.load.image(
           "placeholderCharacter",
-          "public/assets/placeholderCharacter.png"
+          "/assets/placeholderCharacter.png"
         );
 
   }

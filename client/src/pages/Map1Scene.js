@@ -10,11 +10,11 @@ class Map1Scene extends Phaser.Scene {
   preload() {
     this.load.image(
       "placeholderMap1Scene",
-      "public/assets/placeholderMap1Scene.png"
+      "/assets/placeholderMap1Scene.png"
     );
     this.load.image(
       "placeholderCharacter",
-      "public/assets/placeholderCharacter.png"
+      "/assets/placeholderCharacter.png"
     );
     this.load.image("door", "/assets/door.png");
   }

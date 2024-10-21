@@ -1,37 +1,33 @@
 const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
+  scalar JSON
+  
   type User {
-    _id: ID
-    username: String
-    email: String
-    progress: [String] # This is where we store the stages the user has already completed
+    _id: ID!
+    username: String!
+    email: String!
     token: String
   }
 
-  type Enemy {
+  type SaveSlot {
     _id: ID
-    name: String
-  }
-
-  type Item {
-    _id: ID
-    name: String
+    userId: ID
+    slotNumber: Int
+    playerStats: JSON
+    progress: JSON
   }
 
   type Query {
     me: User
-    items: [Item]
-    enemies: [Enemy]
+    getSaveSlots(userId: ID!): [SaveSlot]
   }
 
   type Mutation {
     signup(username: String!, email: String!, password: String!): User
     login(username: String!, password: String!): User
-    addEnemy(name: String!): Enemy
-    removeEnemy(name: String!): Enemy
-    addItem(name: String!): Item
-    removeItem(name: String!): Item
+    saveGame(userId: ID!, slotNumber: Int!, playerStats: JSON!, progress: JSON!): SaveSlot
+    loadGame(userId: ID!, slotNumber: Int!): SaveSlot
   }
 `;
 

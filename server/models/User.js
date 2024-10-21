@@ -15,10 +15,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  progress: {
-    type: [String], // Track completed stages
-    default: [], // The user can start with no stages completed / blank progress
-  },
+  saveSlots: [{
+    type: mongoose.Schema.ObjectId,
+    ref: 'SaveSlot' 
+  }],
 });
 
 module.exports = mongoose.model("User", userSchema);

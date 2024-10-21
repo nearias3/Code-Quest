@@ -9,13 +9,29 @@ const typeDefs = gql`
     token: String
   }
 
+  type Enemy {
+    _id: ID
+    name: String
+  }
+
+  type Item {
+    _id: ID
+    name: String
+  }
+
   type Query {
     me: User
+    items: [Item]
+    enemies: [Enemy]
   }
 
   type Mutation {
     signup(username: String!, email: String!, password: String!): User
     login(username: String!, password: String!): User
+    addEnemy(name: String!): Enemy
+    removeEnemy(name: String!): Enemy
+    addItem(name: String!): Item
+    removeItem(name: String!): Item
   }
 `;
 

@@ -4,6 +4,7 @@ const { expressMiddleware } = require("@apollo/server/express4");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const path = require("path");
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
 const { authMiddleware, verifyToken } = require("./utils/auth");
@@ -103,6 +104,14 @@ async function startServer() {
     }
   });
 
+  // Serve static files from the client/dist folder
+  app.use(express.static(path.join(__dirname, "../client/dist")));
+
+  // For any routes that don't match the API routes, serve the index.html
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+  });
+
   // Connect to the server
   app.use(
     "/graphql",
@@ -126,7 +135,6 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}/graphql`);
   });
-
 }
 
 startServer();

@@ -55,7 +55,7 @@ class WorldMapScene extends Phaser.Scene {
 
   update() {
     GameHelpers.handlePlayerMovement(this, this.cursors, this.player);
-    GameHelpers.checkDoorInteraction(this, this.player, this.door, 'Map1Scene');
+    GameHelpers.checkDoorInteraction(this, this.player, this.door, 'BattleScene');
   }
 }
 

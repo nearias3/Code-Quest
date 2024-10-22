@@ -14,6 +14,8 @@
   "dependencies": {
     "@apollo/client": "^3.11.8",
     "@monaco-editor/react": "^4.6.0",
+    "@stripe/react-stripe-js": "^2.8.1",
+    "@stripe/stripe-js": "^4.9.0",
     "cross-fetch": "^4.0.0",
     "dotenv": "^16.4.5",
     "graphql": "^16.9.0",
@@ -22,7 +24,8 @@
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.27.0"
+    "react-router-dom": "^6.27.0",
+    "stripe": "^17.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

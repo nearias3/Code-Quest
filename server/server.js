@@ -7,22 +7,41 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const User = require("./models/User");
-const { authMiddleware, verifyToken } = require("./utils/auth");
+const { authMiddleware } = require("./utils/auth");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 4000;
 
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+console.log("Stripe Secret Key:", stripeSecretKey); 
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
+
 async function startServer() {
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => {
+      const token = req.headers.authorization || "";
+      // Only apply authMiddleware if there's a token (i.e., user is logged in)
+      return { user: token ? authMiddleware(req) : null };
+    },
+  });
 
   await server.start();
 
   const app = express();
-  app.use(cors());
+
+  app.use(cors({ origin: "*" }));
+
   app.use(bodyParser.json());
+
+  // Connect to the server
+  app.use(
+    "/graphql",
+    expressMiddleware(server)
+  );
 
   // MongoDB Schema
   const SaveSlotSchema = new mongoose.Schema({
@@ -107,6 +126,36 @@ async function startServer() {
     }
   });
 
+  app.post("/create-checkout-session", async (req, res) => {
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: "Support Wizard's Apprentice",
+              },
+              unit_amount: req.body.amount * 100, // Convert dollars to cents
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${process.env.FRONTEND_URL}/success`,
+        cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      });
+
+      res.json({ id: session.id });
+    } catch (error) {
+      console.error("Error creating Stripe session:", error);
+      res.status(500).json({ error: "Failed to create session" });
+    }
+  });
+
+
+
   // Serve static files from the client/dist folder
   app.use(express.static(path.join(__dirname, "../client/dist")));
 
@@ -114,14 +163,6 @@ async function startServer() {
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../client/dist/index.html"));
   });
-
-  // Connect to the server
-  app.use(
-    "/graphql",
-    expressMiddleware(server, {
-      context: ({ req }) => ({ user: authMiddleware(req) }),
-    })
-  );
 
   mongoose
     .connect(process.env.MONGODB_URI, {

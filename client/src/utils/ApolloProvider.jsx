@@ -8,7 +8,10 @@ import {
 import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:4000/graphql",
+  uri:
+    import.meta.env.VITE_GRAPHQL_SERVER_URI ||
+    "https://wizard-s-apprentice.onrender.com/graphql",
+  fetch,
 });
 
 const authLink = setContext((_, { headers }) => {
@@ -25,6 +28,7 @@ const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
+
 
 const ApolloProvider = ({ children }) => {
   return <Provider client={client}>{children}</Provider>;

@@ -17,8 +17,9 @@ async function startServer() {
     typeDefs,
     resolvers,
     context: ({ req }) => {
-      const user = authMiddleware(req);
-      return { user };
+      const token = req.headers.authorization || "";
+      // Only apply authMiddleware if there's a token (i.e., user is logged in)
+      return { user: token ? authMiddleware(req) : null };
     },
   });
 

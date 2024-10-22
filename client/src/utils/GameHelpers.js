@@ -7,7 +7,7 @@ const GameHelpers = {
   },
 
   createPlayer(scene) {
-    scene.player = scene.physics.add.sprite(400, 300, "placeholderCharacter");
+    scene.player = scene.physics.add.sprite(300, 100, "placeholderCharacter");
     scene.player.setCollideWorldBounds(true);
     const scaleFactor = 0.1;
     scene.player.setDisplaySize(

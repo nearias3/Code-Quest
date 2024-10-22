@@ -1,5 +1,4 @@
 import ApolloProvider from "./utils/ApolloProvider";
-import GameArea from "./components/GameArea.jsx";
 import Layout from "./components/Layout";
 import HomePage from "./pages/Homepage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
@@ -14,16 +13,15 @@ const App = () => {
   return (
     <ApolloProvider>
       <Router>
-        <Layout>
+        <Layout onLogin={handleLogin}>
+          {" "}
+          {/* Pass handleLogin to Layout */}
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </Layout>
-        <div>
-          <GameArea onLogin={handleLogin} />
-        </div>
       </Router>
     </ApolloProvider>
   );

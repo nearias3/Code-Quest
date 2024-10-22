@@ -47,7 +47,7 @@ const resolvers = {
         throw new AuthenticationError("Invalid credentials");
       }
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-      return { ...user._doc, token };
+     return { _id: user._id, username: user.username, token };
     },
     signup: async (_, { username, email, password }) => {
       const normalizedUsername = username.trim().toLowerCase();
@@ -58,7 +58,12 @@ const resolvers = {
         password: hashedPw,
       });
       const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-      return { ...user._doc, token };
+      return {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        token,
+      };
     },
     saveGame: async (_, { userId, slotNumber, playerStats, progress }) => {
       const saveSlot = await SaveSlot.findOneAndUpdate(

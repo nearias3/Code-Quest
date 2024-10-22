@@ -137,21 +137,22 @@ class GameScene extends Phaser.Scene {
       const response = await signupUser(username, email, password);
       console.log("Signup response:", response);
 
-      if (response && response.signup && response.signup.token) {
-        localStorage.setItem("token", response.signup.token);
-        this.isLoggedIn = true; // User is now signed up and logged in
-        console.log("Signup successful, token stored.");
+    
+      if (response && response.token) {
+      localStorage.setItem("token", response.token);
+      this.isLoggedIn = true; // User is now signed up and logged in
+      console.log("Signup successful, token stored.");
 
-        // Remove the form
-        this.form.destroy();
+      // Remove the form
+      this.form.destroy();
 
-        // Re-enable keyboard input after the form is removed
-        this.input.keyboard.enabled = true;
+      // Re-enable keyboard input after the form is removed
+      this.input.keyboard.enabled = true;
 
-        GameHelpers.displayMainMenu(this); // Return to main menu
-      } else {
-        throw new Error("Signup failed. Please try again.");
-      }
+      GameHelpers.displayMainMenu(this); // Return to main menu
+    } else {
+      throw new Error("Signup failed. Please try again.");
+    }
     } catch (error) {
       console.error("Signup failed:", error);
       this.add

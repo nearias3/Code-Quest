@@ -7,6 +7,9 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const User = require("./models/User");
 const { authMiddleware, verifyToken } = require("./utils/auth");
 require("dotenv").config();
 
@@ -21,7 +24,7 @@ async function startServer() {
   app.use(cors());
   app.use(bodyParser.json());
 
-  // MongoDB Schema (might need to move this into a different file)
+  // MongoDB Schema
   const SaveSlotSchema = new mongoose.Schema({
     userId: String,
     slotNumber: Number,
@@ -30,6 +33,71 @@ async function startServer() {
   });
 
   const SaveSlot = mongoose.model("SaveSlot", SaveSlotSchema);
+
+  // Signup route
+  app.post("/api/signup", async (req, res) => {
+    const { username, email, password } = req.body;
+
+    try {
+      // Check if the user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create a new user
+      const newUser = new User({
+        username,
+        email,
+        password: hashedPassword,
+      });
+
+      // Save the user to the database
+      await newUser.save();
+
+      // Create a JWT token
+      const token = jwt.sign({ _id: newUser._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      res.status(201).json({ token });
+    } catch (error) {
+      console.error("Error during signup:", error);
+      res.status(500).json({ message: "Signup failed", error });
+    }
+  });
+
+  // Login route
+  app.post("/api/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+      // Check if the user exists
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
+      }
+
+      // Check the password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
+
+      // Create a JWT token
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      res.json({ token });
+    } catch (error) {
+      console.error("Error during login:", error);
+      res.status(500).json({ message: "Login failed", error });
+    }
+  });
 
   // Route to save the game
   app.post("/api/save-game", async (req, res) => {

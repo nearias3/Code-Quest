@@ -162,7 +162,7 @@ class GameScene extends Phaser.Scene {
         .setOrigin(0.5);
     }
   }
-  
+
 
   // Return to main menu option from inside the game
   returnToMainMenu() {

@@ -1,0 +1,39 @@
+/* Header and Footer */
+header, footer {
+  background-color: #241827;
+  color: #dadaca;
+  padding: 10px;
+}
+
+header a, footer a {
+  color: #7f558a;
+  text-decoration: none;
+}
+
+header a:hover, footer a:hover {
+  color: #412B47;
+}
+
+/* General Text and Borders */
+
+body {
+  color: #bbbcc2;
+  background-color: #412B47;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-align: center;
+}
+.border-element {
+  border: 2px solid #5721c5;
+}
+
+a {
+  color: #7f558a;
+  text-decoration: none;
+}
+/* Special Glow for Magic Elements */
+.magic-glow {
+  box-shadow: 0 0 10px #d3efff;
+}

@@ -1,6 +1,6 @@
 const Header = () => {
   return (
-    <header style={{ backgroundColor: "#333", color: "#fff", padding: "10px" }}>
+    <header>
       <nav>
         <ul style={{ display: "flex", justifyContent: "space-between" }}>
           <li>

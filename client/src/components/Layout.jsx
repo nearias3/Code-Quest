@@ -1,13 +1,11 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import PropTypes from 'prop-types';
-import GameArea from "./GameArea";
 
-const Layout = ({ children, onLogin }) => {
+const Layout = ({ children }) => {
   return (
     <div>
       <Header />
-      <GameArea onLogin={onLogin} />
       <main>{children}</main>
       <Footer />
     </div>
@@ -16,7 +14,6 @@ const Layout = ({ children, onLogin }) => {
 
 Layout.propTypes = {
   children: PropTypes.node.isRequired,
-  onLogin: PropTypes.func.isRequired,
 };
 
 

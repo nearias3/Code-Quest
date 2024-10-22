@@ -42,6 +42,9 @@ class GameScene extends Phaser.Scene {
     // Clear the current menu content
     this.children.removeAll();
 
+    // Disable keyboard input (stops movement keys like WASD)
+    this.input.keyboard.enabled = false;
+
     // Add a form to contain the login inputs and button
     this.form = this.add.dom(400, 250).createFromHTML(`
     <form id="login-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
@@ -84,7 +87,10 @@ class GameScene extends Phaser.Scene {
         // Remove the form
         this.form.destroy();
 
-        this.displayMainMenu(); // Go back to the main menu
+        // Re-enable keyboard input after the form is removed
+        this.input.keyboard.enabled = true;
+
+        GameHelpers.displayMainMenu(this); // Go back to the main menu
       } else {
         throw new Error("Login failed. Please try again.");
       }
@@ -103,6 +109,9 @@ class GameScene extends Phaser.Scene {
   showSignupForm() {
     // Clear the current menu content
     this.children.removeAll();
+
+    // Disable keyboard input (stops movement keys like WASD)
+    this.input.keyboard.enabled = false;
 
     this.form = this.add.dom(400, 250).createFromHTML(`
       <form id="signup-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
@@ -136,7 +145,10 @@ class GameScene extends Phaser.Scene {
         // Remove the form
         this.form.destroy();
 
-        this.displayMainMenu(); // Return to main menu
+        // Re-enable keyboard input after the form is removed
+        this.input.keyboard.enabled = true;
+
+        GameHelpers.displayMainMenu(this); // Return to main menu
       } else {
         throw new Error("Signup failed. Please try again.");
       }
@@ -161,7 +173,7 @@ class GameScene extends Phaser.Scene {
     localStorage.removeItem("token");
     this.isLoggedIn = false; // Mark the user as logged out
     console.log("Logged out");
-    this.displayMainMenu(); // Refresh the menu after logging out
+    GameHelpers.displayMainMenu(this); // Refresh the menu after logging out
   }
 
   // New Game logic

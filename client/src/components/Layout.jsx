@@ -5,9 +5,11 @@ import PropTypes from 'prop-types';
 const Layout = ({ children }) => {
   return (
     <div>
-      <Header />
-      <main>{children}</main>
-      <Footer />
+      <div id="layout">
+        <Header />
+        <main>{children}</main>
+        <Footer />
+      </div>
     </div>
   );
 };

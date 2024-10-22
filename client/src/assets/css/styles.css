@@ -1,8 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  background-color: #412B47;
+  color: #bbbcc2;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+div#layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  height: 100%;
+}
+
+main {
+  flex-grow: 1;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
 /* Header and Footer */
-header, footer {
+
+header {
+  background-color: #241827;
+  color: #dadaca;
+  padding: 20px 0;
+  font-size: 25px;
+  text-align: center;
+  width: 100%;
+}
+
+.header-logo {
+  width: 200px;
+  height: auto;
+  padding-top: 10px;
+  padding-bottom: 30px;
+}
+
+footer {
   background-color: #241827;
   color: #dadaca;
   padding: 10px;
+  font-size: 25px;
+  text-align: center;
+  width: 100%;
+}
+
+footer {
+  margin-top: auto;
+}
+
+/* Navigation */
+header nav ul {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  gap: 50px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 header a, footer a {
@@ -14,17 +81,6 @@ header a:hover, footer a:hover {
   color: #412B47;
 }
 
-/* General Text and Borders */
-
-body {
-  color: #bbbcc2;
-  background-color: #412B47;
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  text-align: center;
-}
 .border-element {
   border: 2px solid #5721c5;
 }
@@ -33,7 +89,40 @@ a {
   color: #7f558a;
   text-decoration: none;
 }
+
 /* Special Glow for Magic Elements */
 .magic-glow {
   box-shadow: 0 0 10px #d3efff;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+
+  header nav ul {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  main {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  footer a {
+    display: block;
+    margin: 5px 0;
+  }
+
+  .game-area {
+    width: 100%;
+    height: auto;
+  }
 }

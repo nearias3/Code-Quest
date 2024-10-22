@@ -2,10 +2,17 @@ const Header = () => {
   return (
     <header>
       <nav>
-        <ul style={{ display: "flex", justifyContent: "space-between" }}>
+          <a href="/" className="logo-container">
+            <img
+              src="/assets/logotext.png"
+              alt="Wizard's Apprentice Logo"
+              className="header-logo"
+            />
+          </a>
+        <ul>
           <li>
             <a href="/" style={{ color: "#fff" }}>
-              Home
+              Play
             </a>
           </li>
           <li>

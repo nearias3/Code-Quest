@@ -7,22 +7,32 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const User = require("./models/User");
-const { authMiddleware, verifyToken } = require("./utils/auth");
+const { authMiddleware } = require("./utils/auth");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 4000;
 
 async function startServer() {
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => {
+      const user = authMiddleware(req);
+      return { user };
+    },
+  });
 
   await server.start();
 
   const app = express();
   app.use(cors());
   app.use(bodyParser.json());
+
+  // Connect to the server
+  app.use(
+    "/graphql",
+    expressMiddleware(server)
+  );
 
   // MongoDB Schema
   const SaveSlotSchema = new mongoose.Schema({
@@ -114,14 +124,6 @@ async function startServer() {
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../client/dist/index.html"));
   });
-
-  // Connect to the server
-  app.use(
-    "/graphql",
-    expressMiddleware(server, {
-      context: ({ req }) => ({ user: authMiddleware(req) }),
-    })
-  );
 
   mongoose
     .connect(process.env.MONGODB_URI, {

@@ -8,10 +8,15 @@ const path = require("path");
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
 const { authMiddleware } = require("./utils/auth");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
 
 const PORT = process.env.PORT || 4000;
+
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+console.log("Stripe Secret Key:", stripeSecretKey); 
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 
 async function startServer() {
   const server = new ApolloServer({
@@ -27,7 +32,9 @@ async function startServer() {
   await server.start();
 
   const app = express();
-  app.use(cors());
+
+  app.use(cors({ origin: "*" }));
+
   app.use(bodyParser.json());
 
   // Connect to the server
@@ -119,28 +126,34 @@ async function startServer() {
     }
   });
 
-  router.post("/create-checkout-session", async (req, res) => {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Support Wizard's Apprentice",
+  app.post("/create-checkout-session", async (req, res) => {
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: "Support Wizard's Apprentice",
+              },
+              unit_amount: req.body.amount * 100, // Convert dollars to cents
             },
-            unit_amount: req.body.amount * 100, // Convert dollars to cents
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/success`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
-    });
+        ],
+        mode: "payment",
+        success_url: `${process.env.FRONTEND_URL}/success`,
+        cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      });
 
-    res.json({ id: session.id });
+      res.json({ id: session.id });
+    } catch (error) {
+      console.error("Error creating Stripe session:", error);
+      res.status(500).json({ error: "Failed to create session" });
+    }
   });
+
 
 
   // Serve static files from the client/dist folder

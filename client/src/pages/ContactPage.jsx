@@ -7,26 +7,27 @@ const Contact = () => {
         free to reach out to us!
       </p>
       <ul>
-        <li>Email: support@wizardsapprentice.com</li>
         <li>
-          Twitter:{" "}
-          <a
-            href="https://twitter.com/wizards_apprentice"
-            target="_blank"
-            rel="noreferrer"
-          >
-            @wizards_apprentice
+          Email:{" "}
+          <a href="mailto:askwizardsapprentice@gmail.com">
+            askwizardsapprentice@gmail.com
           </a>
         </li>
         <li>
-          GitHub:{" "}
+          Twitter:{" "}
           <a
-            href="https://github.com/wizards-apprentice"
+            href="https://x.com/wizsapprentice"
             target="_blank"
             rel="noreferrer"
           >
-            Our GitHub
+            @wizsapprentice
           </a>
+        </li>
+        <li>
+          GitHub: <a href="https://github.com/A-Morones"> Adalberto M </a> |
+          <a href="https://github.com/cneale92"> Connor N </a> |
+          <a href="https://github.com/horizonbound0"> Ken W </a> |
+          <a href="https://github.com/nearias"> Nicole H </a>
         </li>
       </ul>
     </div>

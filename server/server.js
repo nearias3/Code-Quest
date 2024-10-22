@@ -7,6 +7,9 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const User = require("./models/User");
 const { authMiddleware, verifyToken } = require("./utils/auth");
 require("dotenv").config();
 
@@ -21,7 +24,7 @@ async function startServer() {
   app.use(cors());
   app.use(bodyParser.json());
 
-  // MongoDB Schema (might need to move this into a different file)
+  // MongoDB Schema
   const SaveSlotSchema = new mongoose.Schema({
     userId: String,
     slotNumber: Number,

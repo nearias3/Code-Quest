@@ -16,7 +16,7 @@ class Map2Scene extends Phaser.Scene {
       "placeholderCharacter",
       "/assets/placeholderCharacter.png"
     );
-    this.load.image("door", "/assets/door.png");
+    this.load.image("door", "src/assets/door.png");
   }
 
   create() {

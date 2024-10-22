@@ -2,7 +2,7 @@ const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
   scalar JSON
-  
+
   type User {
     _id: ID!
     username: String!
@@ -23,10 +23,19 @@ const typeDefs = gql`
     getSaveSlots(userId: ID!): [SaveSlot]
   }
 
+  type AuthPayload {
+    token: String!
+  }
+
   type Mutation {
     signup(username: String!, email: String!, password: String!): User
     login(username: String!, password: String!): User
-    saveGame(userId: ID!, slotNumber: Int!, playerStats: JSON!, progress: JSON!): SaveSlot
+    saveGame(
+      userId: ID!
+      slotNumber: Int!
+      playerStats: JSON!
+      progress: JSON!
+    ): SaveSlot
     loadGame(userId: ID!, slotNumber: Int!): SaveSlot
   }
 `;

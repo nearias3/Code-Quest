@@ -2,19 +2,25 @@ import { gql, ApolloClient, InMemoryCache } from "@apollo/client";
 import { createHttpLink } from "@apollo/client";
 import fetch from "cross-fetch";
 
-// Define the mutation for login
-const LOGIN_USER = gql`
-  mutation login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
-      token
-    }
-  }
-`;
 
 // Define the mutation for signup
 const SIGNUP_USER = gql`
   mutation signup($username: String!, $email: String!, $password: String!) {
     signup(username: $username, email: $email, password: $password) {
+      _id
+      username
+      email
+      token
+    }
+  }
+`;
+
+// Define the mutation for login
+const LOGIN_USER = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      _id
+      Username
       token
     }
   }
@@ -23,7 +29,9 @@ const SIGNUP_USER = gql`
 // Apollo Client setup pointing to graphql
 const client = new ApolloClient({
   link: createHttpLink({
-    uri: import.meta.env.VITE_GRAPHQL_SERVER_URI, // include this in .env file
+    uri:
+      import.meta.env.VITE_GRAPHQL_SERVER_URI ||
+      "http://localhost:4000/graphql",
     fetch,
   }),
   cache: new InMemoryCache(),
@@ -39,23 +47,11 @@ export async function loginUser(username, password) {
   return data;
 }
 
-/// Signup function
+// Define the mutation for signup
 export async function signupUser(username, email, password) {
-  try {
-    const response = await client.mutate({
-      mutation: SIGNUP_USER,
-      variables: { username, email, password },
-    });
-
-    console.log("Signup response:", response);
-
-    if (!response.data || !response.data.signup) {
-      throw new Error("Signup failed. Please try again.");
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error("Signup error:", error);
-    throw new Error("Signup failed. Please try again."); // Ensure error is thrown and caught in GameScene.js
-  }
+  const { data } = await client.mutate({
+    mutation: SIGNUP_USER,
+    variables: { username, email, password },
+  });
+  return data.signup;
 }

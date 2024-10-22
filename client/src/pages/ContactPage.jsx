@@ -1,3 +1,5 @@
+import Donate from "../components/Donate";
+
 const Contact = () => {
   return (
     <div style={{ padding: "20px" }}>
@@ -27,9 +29,10 @@ const Contact = () => {
           GitHub: <a href="https://github.com/A-Morones"> Adalberto M </a> |
           <a href="https://github.com/cneale92"> Connor N </a> |
           <a href="https://github.com/horizonbound0"> Ken W </a> |
-          <a href="https://github.com/nearias"> Nicole H </a>
+          <a href="https://github.com/nearias3"> Nicole H </a>
         </li>
       </ul>
+      <Donate />
     </div>
   );
 };

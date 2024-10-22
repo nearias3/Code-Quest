@@ -11,15 +11,6 @@ const LOGIN_USER = gql`
   }
 `;
 
-// Define the mutation for signup
-const SIGNUP_USER = gql`
-  mutation signup($username: String!, $email: String!, $password: String!) {
-    signup(username: $username, email: $email, password: $password) {
-      token
-    }
-  }
-`;
-
 // Apollo Client setup pointing to graphql
 const client = new ApolloClient({
   link: createHttpLink({
@@ -39,21 +30,28 @@ export async function loginUser(username, password) {
   return data;
 }
 
+// Vite environment variable for the API URL
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+
 /// Signup function
 export async function signupUser(username, email, password) {
   try {
-    const response = await client.mutate({
-      mutation: SIGNUP_USER,
-      variables: { username, email, password },
+    const response = await fetch(`${API_URL}/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, email, password }),
     });
-
-    console.log("Signup response:", response);
+    
+    const result = await response.json();
 
     if (!response.data || !response.data.signup) {
       throw new Error("Signup failed. Please try again.");
     }
 
-    return response.data;
+
+    return result;
   } catch (error) {
     console.error("Signup error:", error);
     throw new Error("Signup failed. Please try again."); // Ensure error is thrown and caught in GameScene.js

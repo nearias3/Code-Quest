@@ -8,6 +8,10 @@ class GameScene extends Phaser.Scene {
     this.isLoggedIn = false;
     this.isGameInProgress = false; // Track if the game is in progress
     this.form = null; // Initialize form as null
+
+    // Bind the login and signup methods to this scene instance
+    this.showLoginForm = this.showLoginForm.bind(this);
+    this.showSignupForm = this.showSignupForm.bind(this);
   }
 
   preload() {
@@ -17,17 +21,17 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // Pass reference of `checkLoginStatus` to be used elsewhere
-    this.checkLoginStatus = this.checkLoginStatus.bind(this);
-    
+    // Debugging log
+    console.log("In create:", {
+      showLoginForm: this.showLoginForm,
+      showSignupForm: this.showSignupForm,
+    });
+
     // Check if user is logged in via token
     this.checkLoginStatus();
 
     // Set up the menu using the helper
-    GameHelpers.displayMainMenu(this, [
-      { text: "New Game", action: this.startNewGame.bind(this) },
-      { text: "Settings", action: this.openSettings.bind(this) },
-    ]);
+    GameHelpers.displayMainMenu(this);
     console.log("GameScene: create");
   }
 
@@ -39,6 +43,7 @@ class GameScene extends Phaser.Scene {
   
   // Shared form handling (login, sign up, save game, load game)
   showLoginForm() {
+    console.log("Login form should show now");
     // Clear the current menu content
     this.children.removeAll();
 
@@ -107,20 +112,34 @@ class GameScene extends Phaser.Scene {
 
   // Signup form logic
   showSignupForm() {
+     console.log("Signup form should show now");
     // Clear the current menu content
     this.children.removeAll();
 
     // Disable keyboard input (stops movement keys like WASD)
     this.input.keyboard.enabled = false;
 
-    this.form = this.add.dom(400, 250).createFromHTML(`
-      <form id="signup-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
-        <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-        <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-        <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-        <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
-      </form>
-    `);
+    // Calculate the center of the canvas
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+    
+    // Add a form to contain the login inputs and button
+    this.form = this.add.dom(centerX, centerY).createFromHTML(`
+      <form id="signup-form" style="
+      position: absolute; 
+      left: 50%; 
+      top: 50%; 
+      transform: translate(-50%, -50%); 
+      background-color: rgba(0, 0, 0, 0.8); 
+      padding: 20px; 
+      border-radius: 10px; 
+      text-align: center;">
+      <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+      <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+      <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+      <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
+    </form>
+  `);
 
     this.form.addListener("submit").on("submit", (event) => {
       event.preventDefault();
@@ -167,7 +186,10 @@ class GameScene extends Phaser.Scene {
 
   // Return to main menu option from inside the game
   returnToMainMenu() {
-    this.scene.start("GameScene");
+    this.scene.start("GameScene", {
+      showLoginForm: this.showLoginForm,
+      showSignupForm: this.showSignupForm,
+    });
   }
 
   logout() {
@@ -180,7 +202,10 @@ class GameScene extends Phaser.Scene {
   // New Game logic
   startNewGame() {
     console.log("Start New Game clicked!");
-    this.scene.start("WorldMapScene");
+    this.scene.start("WorldMapScene", {
+      showLoginForm: this.showLoginForm,
+      showSignupForm: this.showSignupForm,
+    });
   }
 
   async saveGame() {

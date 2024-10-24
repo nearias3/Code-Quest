@@ -14,6 +14,7 @@ const GameHelpers = {
       scene.player.width * scaleFactor,
       scene.player.height * scaleFactor
     );
+    
   },
 
   handlePlayerMovement(scene, cursors, player) {
@@ -44,6 +45,14 @@ const GameHelpers = {
   },
 
   displayMainMenu(scene) {
+    console.log("Scene Key:", scene.scene.key);
+    console.log("Has showLoginForm:", typeof scene.showLoginForm);
+    console.log("Scene object:", scene);
+
+    if (typeof scene.showLoginForm !== "function") {
+      console.error("showLoginForm is not defined on this scene");
+    }
+
     if (scene.checkLoginStatus) {
       scene.checkLoginStatus();
     }
@@ -67,7 +76,9 @@ const GameHelpers = {
         text: scene.isLoggedIn ? "Load Game" : "Login",
         action: scene.isLoggedIn
           ? scene.showLoadSlots.bind(scene)
-          : scene.showLoginForm.bind(scene),
+          : scene.showLoginForm
+          ? scene.showLoginForm.bind(scene)
+          : () => console.error("showLoginForm is not defined on this scene"),
       },
     ];
 
@@ -94,7 +105,9 @@ const GameHelpers = {
       });
       menuOptions.push({
         text: "Sign Up",
-        action: scene.showSignupForm.bind(scene),
+        action: scene.showSignupForm
+          ? scene.showSignupForm.bind(scene)
+          : () => console.error("showSignupForm is not defined on this scene"),
       });
     }
 
@@ -112,6 +125,82 @@ const GameHelpers = {
       text.on("pointerover", () => text.setFill("#ff0"));
       text.on("pointerout", () => text.setFill("#fff"));
       text.on("pointerdown", option.action);
+    });
+  },
+
+// Shared form handling (login, sign up, save game, load game)
+  showLoginForm() {
+    console.log("Login form should show now");
+    // Clear the current menu content
+    this.children.removeAll();
+
+    // Disable keyboard input (stops movement keys like WASD)
+    this.input.keyboard.enabled = false;
+
+    // Calculate the center of the canvas
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+    
+    // Add a form to contain the login inputs and button
+    this.form = this.add.dom(centerX, centerY).createFromHTML(`
+      <form id="signup-form" style="
+      position: absolute; 
+      left: 50%; 
+      top: 50%; 
+      transform: translate(-50%, -50%); 
+      background-color: rgba(0, 0, 0, 0.8); 
+      padding: 20px; 
+      border-radius: 10px; 
+      text-align: center;">
+      <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+      <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+      <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+      <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
+    </form>
+  `);
+
+    // Add form submit event listener
+    this.form.addListener("submit").on("submit", (event) => {
+      event.preventDefault(); // Prevent page refresh
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      this.attemptLogin(username, password); // Trigger login attempt
+    });
+    // Handle "Sign Up" link to switch to sign up form
+    document
+      .getElementById("signup-link")
+      .addEventListener("click", (event) => {
+        event.preventDefault();
+        this.showSignupForm(); // Replace login with signup form
+      });
+  },
+
+  // Signup form logic
+  showSignupForm() {
+     console.log("Signup form should show now");
+    // Clear the current menu content
+    this.children.removeAll();
+
+    // Disable keyboard input (stops movement keys like WASD)
+    this.input.keyboard.enabled = false;
+
+    this.form = this.add.dom(400, 250).createFromHTML(`
+      <form id="signup-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
+        <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
+      </form>
+    `);
+
+    this.form.addListener("submit").on("submit", (event) => {
+      event.preventDefault();
+      const username = document.getElementById("signup-username").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      this.attemptSignup(username, email, password);
     });
   },
 
@@ -308,6 +397,10 @@ const GameHelpers = {
       .setOrigin(0.5)
       .setInteractive();
 
+    console.log("scene.showLoginForm:", scene.showLoginForm); // Debug log
+    console.log("scene.showSignupForm:", scene.showSignupForm); // Debug log
+
+
     // Add interactive elements for logged-in or not logged-in users
     let additionalOptions = [];
 
@@ -331,9 +424,9 @@ const GameHelpers = {
       additionalOptions = [loadText, saveText, settingsText];
 
       // Add interactivity for load and save game
-      loadText.on("pointerdown", () => GameHelpers.showLoadSlots(scene));
-      saveText.on("pointerdown", () => GameHelpers.showSaveSlots(scene));
-      settingsText.on("pointerdown", () => GameHelpers.openSettings(scene));
+      loadText.on("pointerdown", () => scene.showLoadSlots(scene));
+      saveText.on("pointerdown", () => scene.showSaveSlots(scene));
+      settingsText.on("pointerdown", () => scene.openSettings(scene));
     } else {
       // Not logged-in users get Login and Signup options
       const loginText = scene.add
@@ -349,8 +442,21 @@ const GameHelpers = {
       additionalOptions = [loginText, signupText];
 
       // Add interactivity for login and signup
-      loginText.on("pointerdown", () => scene.showLoginForm());
-      signupText.on("pointerdown", () => scene.showSignupForm());
+      loginText.on("pointerdown", () => {
+        if (typeof scene.showLoginForm === "function") {
+          scene.showLoginForm(); // Call the method on the current scene
+        } else {
+          console.error("showLoginForm is not defined.");
+        }
+      });
+
+      signupText.on("pointerdown", () => {
+        if (typeof scene.showSignupForm === "function") {
+          scene.showSignupForm(); // Call the method on the current scene
+        } else {
+          console.error("showSignupForm is not defined.");
+        }
+      });
     }
 
     // Quit Game (this option is for both logged-in and not-logged-in users)

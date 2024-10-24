@@ -20,7 +20,12 @@ class WorldMapScene extends Phaser.Scene {
 
   }
 
-  create() {
+  create(data) {
+    // Attach the login and signup methods if they are passed
+    this.showLoginForm = data.showLoginForm;
+    this.showSignupForm = data.showSignupForm;
+
+    
     const mapImage = this.add.image(400, 300, "placeholderWorldMap");
     mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 
@@ -48,7 +53,7 @@ class WorldMapScene extends Phaser.Scene {
 
     // Listen for the "Enter" key to toggle pause
     this.input.keyboard.on("keydown-ENTER", () => {
-      GameHelpers.togglePauseMenu(this); 
+      GameHelpers.togglePauseMenu(this);
     });
   }
 

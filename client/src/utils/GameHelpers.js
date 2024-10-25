@@ -46,6 +46,14 @@ const GameHelpers = {
   },
 
   displayMainMenu(scene) {
+    console.log("Scene Key:", scene.scene.key);
+    console.log("Has showLoginForm:", typeof scene.showLoginForm);
+    console.log("Scene object:", scene);
+
+    if (typeof scene.showLoginForm !== "function") {
+      console.error("showLoginForm is not defined on this scene");
+    }
+
     if (scene.checkLoginStatus) {
       scene.checkLoginStatus();
     }
@@ -59,44 +67,41 @@ const GameHelpers = {
       })
       .setOrigin(0.5);
 
-    // Menu options, show New Game and Settings regardless of if LoggedIn or not
+    // Menu options, show New Game regardless of if LoggedIn or not
     const menuOptions = [
       {
-        text: "New Game",
-        action: scene.startNewGame.bind(scene),
-      },
-      {
-        text: scene.isLoggedIn ? "Load Game" : "Login",
+        text: scene.isLoggedIn ? "New Game" : "Login",
         action: scene.isLoggedIn
-          ? scene.showLoadSlots.bind(scene)
-          : scene.showLoginForm.bind(scene),
+          ? scene.startNewGame.bind(scene)
+          : scene.showLoginForm
+          ? scene.showLoginForm.bind(scene)
+          : () => console.error("showLoginForm is not defined on this scene"),
       },
     ];
 
     // Add "Save Game" option if the user is logged in
     if (scene.isLoggedIn) {
       menuOptions.push({
+        text: "Load Game",
+        action: scene.showLoadSlots.bind(scene),
+      });
+      menuOptions.push({
         text: "Save Game",
         action: scene.saveGame.bind(scene),
       });
 
-      menuOptions.push({
-        text: "Settings",
-        action: scene.openSettings.bind(scene),
-      });
       menuOptions.push({
         text: "Logout",
         action: scene.logout.bind(scene),
       });
     } else {
       // If not logged in, add "Sign Up" option
-      menuOptions.push({
-        text: "Settings",
-        action: scene.openSettings.bind(scene),
-      });
+
       menuOptions.push({
         text: "Sign Up",
-        action: scene.showSignupForm.bind(scene),
+        action: scene.showSignupForm
+          ? scene.showSignupForm.bind(scene)
+          : () => console.error("showSignupForm is not defined on this scene"),
       });
     }
 
@@ -173,7 +178,8 @@ const GameHelpers = {
 
   // Save game data to a selected slot
   async performSave(scene, slotNumber) {
-    console.log(`Saving game to slot ${slotNumber}...`);
+    console.log(`Starting performSave for slot ${slotNumber}...`);
+    console.log(`Scene is:`, scene);
 
     // Mockup: Replace this with actual game data (e.g., player stats, progress)
     const playerStats = {
@@ -202,6 +208,7 @@ const GameHelpers = {
       });
 
       const result = await response.json();
+      console.log("Response from server:", result);
 
       if (response.ok) {
         console.log(`Game saved successfully to slot ${slotNumber}:`, result);
@@ -256,7 +263,8 @@ const GameHelpers = {
 
   // Load game data from the selected slot
   async loadGame(scene, slotNumber) {
-    console.log(`Loading game from slot ${slotNumber}...`);
+    console.log(`Starting loadGame for slot ${slotNumber}...`);
+    console.log(`Scene is:`, scene);
 
     try {
       const response = await fetch(
@@ -270,6 +278,7 @@ const GameHelpers = {
       );
 
       const result = await response.json();
+      console.log("Response from server:", result);
 
       if (response.ok) {
         console.log(`Game loaded from slot ${slotNumber}:`, result);
@@ -325,34 +334,27 @@ const GameHelpers = {
         .setOrigin(0.5)
         .setInteractive();
 
-      const settingsText = scene.add
-        .text(0, 40, "Settings", { fontSize: "24px", fill: "#fff" })
-        .setOrigin(0.5)
-        .setInteractive();
-
-      additionalOptions = [loadText, saveText, settingsText];
+      additionalOptions = [loadText, saveText];
 
       // Add interactivity for load and save game
-      loadText.on("pointerdown", () => GameHelpers.showLoadSlots(scene));
-      saveText.on("pointerdown", () => GameHelpers.showSaveSlots(scene));
-      settingsText.on("pointerdown", () => GameHelpers.openSettings(scene));
-    } else {
-      // Not logged-in users get Login and Signup options
-      const loginText = scene.add
-        .text(0, -40, "Login", { fontSize: "24px", fill: "#fff" })
-        .setOrigin(0.5)
-        .setInteractive();
+        loadText.on("pointerdown", () => {
+          if (typeof scene.showLoadSlots === "function") {
+            console.log("Loading game...");
+            GameHelpers.showLoadSlots(scene);
+          } else {
+            console.error("showLoadSlots is not defined on this scene.");
+          }
+        });
 
-      const signupText = scene.add
-        .text(0, 0, "Sign Up", { fontSize: "24px", fill: "#fff" })
-        .setOrigin(0.5)
-        .setInteractive();
+        saveText.on("pointerdown", () => {
+          if (typeof scene.showSaveSlots === "function") {
+            console.log("Saving game...");
+            GameHelpers.showSaveSlots(scene);
+          } else {
+            console.error("showSaveSlots is not defined on this scene.");
+          }
+        });
 
-      additionalOptions = [loginText, signupText];
-
-      // Add interactivity for login and signup
-      loginText.on("pointerdown", () => scene.showLoginForm());
-      signupText.on("pointerdown", () => scene.showSignupForm());
     }
 
     // Quit Game (this option is for both logged-in and not-logged-in users)
@@ -394,10 +396,6 @@ const GameHelpers = {
     scene.pauseMenu.setVisible(false); // Hide pause menu
   },
 
-  openSettings(scene) {
-    // Placeholder for settings logic
-    console.log(scene);
-  },
 };
 
 export default GameHelpers;

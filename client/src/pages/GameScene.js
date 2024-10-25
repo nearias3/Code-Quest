@@ -180,7 +180,7 @@ class GameScene extends Phaser.Scene {
   // New Game logic
   startNewGame() {
     console.log("Start New Game clicked!");
-    this.scene.start("WorldMapScene");
+    this.scene.start("TutorialScene");
   }
 
   async saveGame() {

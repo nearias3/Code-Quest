@@ -7,13 +7,15 @@ const GameHelpers = {
   },
 
   createPlayer(scene) {
-    scene.player = scene.physics.add.sprite(400, 300, "placeholderCharacter");
+    scene.player = scene.physics.add.sprite(400, 300, "apprentice");
     scene.player.setCollideWorldBounds(true);
-    const scaleFactor = 0.1;
-    scene.player.setDisplaySize(
-      scene.player.width * scaleFactor,
-      scene.player.height * scaleFactor
-    );
+
+    // LEAVING THS IN CASE WE NEED IT LATER vvv
+    // const scaleFactor = 0.1;
+    // scene.player.setDisplaySize(
+    //   scene.player.width * scaleFactor,
+    //   scene.player.height * scaleFactor
+    // );
   },
 
   handlePlayerMovement(scene, cursors, player) {

@@ -6,14 +6,9 @@ const enemySchema = new Schema({
         required: true,
         unique: true,
     },
-    def: {
-        type: Number,
-        required: true,
-    },
-    hp: {
-        type: Number,
-        required: true,
-    },
+    desc: {
+        type: String,
+    }
 });
 
 const Enemy = model('Enemy', enemySchema);

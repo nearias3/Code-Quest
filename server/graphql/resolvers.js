@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { User, SaveSlot } = require("../models");
+const { User, SaveSlot, Enemy, Item } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { GraphQLScalarType } = require("graphql");
 const { Kind } = require("graphql/language");
@@ -33,6 +33,12 @@ const resolvers = {
     getSaveSlots: async (_, { userId }) => {
       return await SaveSlot.find({ userId });
     },
+    enemies: async () => {
+      return await Enemy.find({});
+    },
+    items: async () => {
+      return await Item.find({});
+    }
   },
   
   Mutation: {
@@ -80,6 +86,18 @@ const resolvers = {
       }
       return saveSlot;
     },
+    addEnemy: async (parent, { name, desc } ) => {
+      return Enemy.create({ name, desc });
+    },
+    removeEnemy: async (parent, { name } ) => {
+      return Enemy.findOneAndDelete({ name });
+    },
+    addItem: async (parent, { name, desc } ) => {
+      return Item.create({ name, desc });
+    },
+    removeItem: async(parent, { name } ) => {
+      return Item.findOneAndDelete({ name });
+    }
   },
 };
 

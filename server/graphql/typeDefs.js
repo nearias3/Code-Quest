@@ -18,9 +18,23 @@ const typeDefs = gql`
     progress: JSON
   }
 
+  type Enemy {
+    _id: ID
+    name: String!
+    desc: String
+  }
+  
+  type Item {
+    _id: ID
+    name: String!
+    desc: String
+  }
+
   type Query {
     me: User
     getSaveSlots(userId: ID!): [SaveSlot]
+    enemies: [Enemy]
+    items: [Item]    
   }
 
   type AuthPayload {
@@ -37,6 +51,10 @@ const typeDefs = gql`
       progress: JSON!
     ): SaveSlot
     loadGame(userId: ID!, slotNumber: Int!): SaveSlot
+    addEnemy(name: String!, desc: String ): Enemy
+    removeEnemy(name: String!): Enemy
+    addItem(name: String!, desc: String ): Item
+    removeItem(name: String!): Item
   }
 `;
 

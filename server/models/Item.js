@@ -6,6 +6,9 @@ const itemSchema = new Schema({
         required: true,
         unique: true,
     },
+    desc: {
+        type: String
+    }
 });
 
 const Item = model('Item', itemSchema);

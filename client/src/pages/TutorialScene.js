@@ -38,12 +38,16 @@ class TutorialScene extends Phaser.Scene {
     );
   }
 
-  create() {
-    // var player;
-    // var walls;
-    // var buttons;
-    // var doors;
-    // var cursors;
+  create(data) {
+    // Attach the load and save methods if they are passed
+    if (data.showLoadSlots && data.showSaveSlots) {
+      console.log("Received save/load functions in WorldMapScene");
+        this.showLoadSlots = data.showLoadSlots;
+        this.showSaveSlots = data.showSaveSlots;
+        console.log("Attached showLoadSlots and showSaveSlots");
+    } else {
+        console.error("Load and Save slots not passed correctly.");
+    }
 
     this.add.image(400, 400, "room1");
     this.add.image(400, 108, "room2");
@@ -71,10 +75,6 @@ class TutorialScene extends Phaser.Scene {
     this.walls.create(520, 200, "wall-hori").setScale(0.5).refreshBody();
     this.walls.create(280, 200, "wall-hori").setScale(0.5).refreshBody();
 
-    // this.buttons = this.physics.add.group({
-    //   key: "floor-button"
-    // });
-
     this.buttons = this.physics.add.group();
 
     this.buttons.create(200, 250, "floor-button");
@@ -100,11 +100,6 @@ class TutorialScene extends Phaser.Scene {
       d: Phaser.Input.Keyboard.KeyCodes.D,
     });
 
-    // function toggleButton(button) {
-    //   button.setScale(0.8);
-
-    // }
-
     this.physics.add.collider(this.player, this.walls);
     this.physics.add.collider(this.buttons, this.walls);
 
@@ -112,11 +107,6 @@ class TutorialScene extends Phaser.Scene {
 
     this.physics.world.on("overlap", (gameObj1, gameObj2, body1, body2) => {
       gameObj2.setScale(0.8);
-    });
-
-    this.physics.world.off("overlap", (gameObj1, gameObj2, body1, body2) => {
-      gameObj1.setScale(1.2);
-      console.log("wut");
     });
 
     GameHelpers.createPauseMenu(this);

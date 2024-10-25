@@ -2,7 +2,7 @@
 
 ## Description
 
-Wizard's Apprentice is a MERN stack developed role-playing game that allows you to sign up in order to save your progress. The start of the game takes you to the Dimension of Magic (DOM) where you can then explore other levels and engage in turn based battle with opponents. The game will also have an option to purchase (?coins?) to use in game which can be used to change character appearance. 
+Wizard's Apprentice is a MERN stack developed role-playing game that allows you to sign up in order to save your progress. The start of the game takes you to the Dimension of Magic (DOM) where you can then explore other levels and engage in turn based battle with opponents. The game will also have an option to donate to the creators for further development. 
 
 ## User Story
 
@@ -23,7 +23,7 @@ THEN I can select to play a new game or continue an existing game.
 WHEN I am in the map I will be able to roam different areas of the map. THEN I can complete side quest as well as engage in turn-based battle with opponents.
 WHEN I have completed a (insert progress in order to move on)
 THEN I can utilize a door that will take me to other map levels.
-WHEN I need to step away, and save progress I will be able to (What button is created for it.)
+WHEN I need to step away, and save progress I will be able to click "Enter" and will be given an option to save.
 THEN my progress will be saved and will be able to pick back up where i left off.
 ```
 
@@ -35,7 +35,7 @@ Checkout the GitHub Repository link. [Link](https://github.com/nearias3/Wizard-s
 
 ## Preview
 
-(insert 2 to 3 screenshots.)
+
 
 ## Credits
 

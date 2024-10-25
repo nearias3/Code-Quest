@@ -14,7 +14,6 @@ const GameHelpers = {
       scene.player.width * scaleFactor,
       scene.player.height * scaleFactor
     );
-    
   },
 
   handlePlayerMovement(scene, cursors, player) {
@@ -69,13 +68,9 @@ const GameHelpers = {
     // Menu options, show New Game and Settings regardless of if LoggedIn or not
     const menuOptions = [
       {
-        text: "New Game",
-        action: scene.startNewGame.bind(scene),
-      },
-      {
-        text: scene.isLoggedIn ? "Load Game" : "Login",
+        text: scene.isLoggedIn ? "New Game" : "Login",
         action: scene.isLoggedIn
-          ? scene.showLoadSlots.bind(scene)
+          ? scene.startNewGame.bind(scene)
           : scene.showLoginForm
           ? scene.showLoginForm.bind(scene)
           : () => console.error("showLoginForm is not defined on this scene"),
@@ -84,6 +79,10 @@ const GameHelpers = {
 
     // Add "Save Game" option if the user is logged in
     if (scene.isLoggedIn) {
+      menuOptions.push({
+        text: "Load Game",
+        action: scene.showLoadSlots.bind(scene),
+      });
       menuOptions.push({
         text: "Save Game",
         action: scene.saveGame.bind(scene),
@@ -125,82 +124,6 @@ const GameHelpers = {
       text.on("pointerover", () => text.setFill("#ff0"));
       text.on("pointerout", () => text.setFill("#fff"));
       text.on("pointerdown", option.action);
-    });
-  },
-
-// Shared form handling (login, sign up, save game, load game)
-  showLoginForm() {
-    console.log("Login form should show now");
-    // Clear the current menu content
-    this.children.removeAll();
-
-    // Disable keyboard input (stops movement keys like WASD)
-    this.input.keyboard.enabled = false;
-
-    // Calculate the center of the canvas
-    const centerX = this.cameras.main.width / 2;
-    const centerY = this.cameras.main.height / 2;
-    
-    // Add a form to contain the login inputs and button
-    this.form = this.add.dom(centerX, centerY).createFromHTML(`
-      <form id="signup-form" style="
-      position: absolute; 
-      left: 50%; 
-      top: 50%; 
-      transform: translate(-50%, -50%); 
-      background-color: rgba(0, 0, 0, 0.8); 
-      padding: 20px; 
-      border-radius: 10px; 
-      text-align: center;">
-      <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-      <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-      <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-      <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
-    </form>
-  `);
-
-    // Add form submit event listener
-    this.form.addListener("submit").on("submit", (event) => {
-      event.preventDefault(); // Prevent page refresh
-
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-
-      this.attemptLogin(username, password); // Trigger login attempt
-    });
-    // Handle "Sign Up" link to switch to sign up form
-    document
-      .getElementById("signup-link")
-      .addEventListener("click", (event) => {
-        event.preventDefault();
-        this.showSignupForm(); // Replace login with signup form
-      });
-  },
-
-  // Signup form logic
-  showSignupForm() {
-     console.log("Signup form should show now");
-    // Clear the current menu content
-    this.children.removeAll();
-
-    // Disable keyboard input (stops movement keys like WASD)
-    this.input.keyboard.enabled = false;
-
-    this.form = this.add.dom(400, 250).createFromHTML(`
-      <form id="signup-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
-        <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-        <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-        <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-        <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
-      </form>
-    `);
-
-    this.form.addListener("submit").on("submit", (event) => {
-      event.preventDefault();
-      const username = document.getElementById("signup-username").value;
-      const email = document.getElementById("signup-email").value;
-      const password = document.getElementById("signup-password").value;
-      this.attemptSignup(username, email, password);
     });
   },
 
@@ -260,7 +183,8 @@ const GameHelpers = {
 
   // Save game data to a selected slot
   async performSave(scene, slotNumber) {
-    console.log(`Saving game to slot ${slotNumber}...`);
+    console.log(`Starting performSave for slot ${slotNumber}...`);
+    console.log(`Scene is:`, scene);
 
     // Mockup: Replace this with actual game data (e.g., player stats, progress)
     const playerStats = {
@@ -289,6 +213,7 @@ const GameHelpers = {
       });
 
       const result = await response.json();
+      console.log("Response from server:", result);
 
       if (response.ok) {
         console.log(`Game saved successfully to slot ${slotNumber}:`, result);
@@ -343,7 +268,8 @@ const GameHelpers = {
 
   // Load game data from the selected slot
   async loadGame(scene, slotNumber) {
-    console.log(`Loading game from slot ${slotNumber}...`);
+    console.log(`Starting loadGame for slot ${slotNumber}...`);
+    console.log(`Scene is:`, scene);
 
     try {
       const response = await fetch(
@@ -357,6 +283,7 @@ const GameHelpers = {
       );
 
       const result = await response.json();
+      console.log("Response from server:", result);
 
       if (response.ok) {
         console.log(`Game loaded from slot ${slotNumber}:`, result);
@@ -397,10 +324,6 @@ const GameHelpers = {
       .setOrigin(0.5)
       .setInteractive();
 
-    console.log("scene.showLoginForm:", scene.showLoginForm); // Debug log
-    console.log("scene.showSignupForm:", scene.showSignupForm); // Debug log
-
-
     // Add interactive elements for logged-in or not logged-in users
     let additionalOptions = [];
 
@@ -424,39 +347,26 @@ const GameHelpers = {
       additionalOptions = [loadText, saveText, settingsText];
 
       // Add interactivity for load and save game
-      loadText.on("pointerdown", () => scene.showLoadSlots(scene));
-      saveText.on("pointerdown", () => scene.showSaveSlots(scene));
-      settingsText.on("pointerdown", () => scene.openSettings(scene));
-    } else {
-      // Not logged-in users get Login and Signup options
-      const loginText = scene.add
-        .text(0, -40, "Login", { fontSize: "24px", fill: "#fff" })
-        .setOrigin(0.5)
-        .setInteractive();
+        loadText.on("pointerdown", () => {
+          if (typeof scene.showLoadSlots === "function") {
+            console.log("Loading game...");
+            GameHelpers.showLoadSlots(scene);
+          } else {
+            console.error("showLoadSlots is not defined on this scene.");
+          }
+        });
 
-      const signupText = scene.add
-        .text(0, 0, "Sign Up", { fontSize: "24px", fill: "#fff" })
-        .setOrigin(0.5)
-        .setInteractive();
+        saveText.on("pointerdown", () => {
+          if (typeof scene.showSaveSlots === "function") {
+            console.log("Saving game...");
+            GameHelpers.showSaveSlots(scene);
+          } else {
+            console.error("showSaveSlots is not defined on this scene.");
+          }
+        });
 
-      additionalOptions = [loginText, signupText];
 
-      // Add interactivity for login and signup
-      loginText.on("pointerdown", () => {
-        if (typeof scene.showLoginForm === "function") {
-          scene.showLoginForm(); // Call the method on the current scene
-        } else {
-          console.error("showLoginForm is not defined.");
-        }
-      });
-
-      signupText.on("pointerdown", () => {
-        if (typeof scene.showSignupForm === "function") {
-          scene.showSignupForm(); // Call the method on the current scene
-        } else {
-          console.error("showSignupForm is not defined.");
-        }
-      });
+        settingsText.on("pointerdown", () => scene.openSettings(scene));
     }
 
     // Quit Game (this option is for both logged-in and not-logged-in users)

@@ -40,7 +40,6 @@ class GameScene extends Phaser.Scene {
     this.isLoggedIn = !!token;
   }
 
-  
   // Shared form handling (login, sign up, save game, load game)
   showLoginForm() {
     console.log("Login form should show now");
@@ -112,34 +111,21 @@ class GameScene extends Phaser.Scene {
 
   // Signup form logic
   showSignupForm() {
-     console.log("Signup form should show now");
+    console.log("Signup form should show now");
     // Clear the current menu content
     this.children.removeAll();
 
     // Disable keyboard input (stops movement keys like WASD)
     this.input.keyboard.enabled = false;
 
-    // Calculate the center of the canvas
-    const centerX = this.cameras.main.width / 2;
-    const centerY = this.cameras.main.height / 2;
-    
-    // Add a form to contain the login inputs and button
-    this.form = this.add.dom(centerX, centerY).createFromHTML(`
-      <form id="signup-form" style="
-      position: absolute; 
-      left: 50%; 
-      top: 50%; 
-      transform: translate(-50%, -50%); 
-      background-color: rgba(0, 0, 0, 0.8); 
-      padding: 20px; 
-      border-radius: 10px; 
-      text-align: center;">
-      <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-      <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-      <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
-      <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
-    </form>
-  `);
+    this.form = this.add.dom(400, 250).createFromHTML(`
+      <form id="signup-form" style="background-color: rgba(0, 0, 0, 0.8); padding: 20px; border-radius: 10px; text-align: center;">
+        <input type="text" placeholder="Username" id="signup-username" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <input type="email" placeholder="Email" id="signup-email" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <input type="password" placeholder="Password" id="signup-password" style="padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 5px;">
+        <button type="submit" id="signup-btn" style="padding: 10px 20px; background-color: #ffbf00; color: #000; border-radius: 5px;">Sign Up</button>
+      </form>
+    `);
 
     this.form.addListener("submit").on("submit", (event) => {
       event.preventDefault();
@@ -156,22 +142,21 @@ class GameScene extends Phaser.Scene {
       const response = await signupUser(username, email, password);
       console.log("Signup response:", response);
 
-    
       if (response && response.token) {
-      localStorage.setItem("token", response.token);
-      this.isLoggedIn = true; // User is now signed up and logged in
-      console.log("Signup successful, token stored.");
+        localStorage.setItem("token", response.token);
+        this.isLoggedIn = true; // User is now signed up and logged in
+        console.log("Signup successful, token stored.");
 
-      // Remove the form
-      this.form.destroy();
+        // Remove the form
+        this.form.destroy();
 
-      // Re-enable keyboard input after the form is removed
-      this.input.keyboard.enabled = true;
+        // Re-enable keyboard input after the form is removed
+        this.input.keyboard.enabled = true;
 
-      GameHelpers.displayMainMenu(this); // Return to main menu
-    } else {
-      throw new Error("Signup failed. Please try again.");
-    }
+        GameHelpers.displayMainMenu(this); // Return to main menu
+      } else {
+        throw new Error("Signup failed. Please try again.");
+      }
     } catch (error) {
       console.error("Signup failed:", error);
       this.add
@@ -183,13 +168,9 @@ class GameScene extends Phaser.Scene {
     }
   }
 
-
   // Return to main menu option from inside the game
   returnToMainMenu() {
-    this.scene.start("GameScene", {
-      showLoginForm: this.showLoginForm,
-      showSignupForm: this.showSignupForm,
-    });
+    this.scene.start("GameScene");
   }
 
   logout() {
@@ -202,9 +183,11 @@ class GameScene extends Phaser.Scene {
   // New Game logic
   startNewGame() {
     console.log("Start New Game clicked!");
+    console.log("showLoadSlots exists:", !!this.showLoadSlots);
+    console.log("showSaveSlots exists:", !!this.saveGame);
     this.scene.start("WorldMapScene", {
-      showLoginForm: this.showLoginForm,
-      showSignupForm: this.showSignupForm,
+      showLoadSlots: this.showLoadSlots.bind(this),
+      showSaveSlots: this.saveGame.bind(this),
     });
   }
 
@@ -236,7 +219,6 @@ class GameScene extends Phaser.Scene {
       text.on("pointerdown", () => this.performSave(slot)); // Save to the selected slot
     });
   }
-  
 
   // Perform save in the selected slot
   async performSave(slotNumber) {

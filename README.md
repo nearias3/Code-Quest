@@ -33,9 +33,16 @@ To try out the game visit this link. [Link](Enter link)
 
 Checkout the GitHub Repository link. [Link](https://github.com/nearias3/Wizard-s-Apprentice)
 
+## Built With:
+
+- React
+- MongoDB
+- GraphQL
+- Phaser
+
 ## Preview
 
-ncvjwn
+![Main page](/Users/adalbertomorones/Downloads/bootcamp/repos/Wizard-s-Apprentice/client/public/assets/mainpage.png)
 
 ## Credits
 
@@ -43,5 +50,3 @@ ncvjwn
 - Ken Wagner
 - Connor Neale
 - Adalberto Morones
-- Phaser
-- MongoDB

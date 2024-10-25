@@ -324,11 +324,6 @@ class GameScene extends Phaser.Scene {
     this.scene.start("WorldMapScene"); // Example for now
   }
 
-  openSettings() {
-    console.log("Settings clicked!");
-    // Any settings functionalities should be implemented here!!
-  }
-
   handlePlayerMovement(cursors, player) {
     if (cursors.a.isDown) {
       player.setVelocityX(-160);

@@ -65,7 +65,7 @@ const GameHelpers = {
       })
       .setOrigin(0.5);
 
-    // Menu options, show New Game and Settings regardless of if LoggedIn or not
+    // Menu options, show New Game regardless of if LoggedIn or not
     const menuOptions = [
       {
         text: scene.isLoggedIn ? "New Game" : "Login",
@@ -89,19 +89,12 @@ const GameHelpers = {
       });
 
       menuOptions.push({
-        text: "Settings",
-        action: scene.openSettings.bind(scene),
-      });
-      menuOptions.push({
         text: "Logout",
         action: scene.logout.bind(scene),
       });
     } else {
       // If not logged in, add "Sign Up" option
-      menuOptions.push({
-        text: "Settings",
-        action: scene.openSettings.bind(scene),
-      });
+
       menuOptions.push({
         text: "Sign Up",
         action: scene.showSignupForm
@@ -339,12 +332,7 @@ const GameHelpers = {
         .setOrigin(0.5)
         .setInteractive();
 
-      const settingsText = scene.add
-        .text(0, 40, "Settings", { fontSize: "24px", fill: "#fff" })
-        .setOrigin(0.5)
-        .setInteractive();
-
-      additionalOptions = [loadText, saveText, settingsText];
+      additionalOptions = [loadText, saveText];
 
       // Add interactivity for load and save game
         loadText.on("pointerdown", () => {
@@ -365,8 +353,6 @@ const GameHelpers = {
           }
         });
 
-
-        settingsText.on("pointerdown", () => scene.openSettings(scene));
     }
 
     // Quit Game (this option is for both logged-in and not-logged-in users)
@@ -408,10 +394,6 @@ const GameHelpers = {
     scene.pauseMenu.setVisible(false); // Hide pause menu
   },
 
-  openSettings(scene) {
-    // Placeholder for settings logic
-    console.log(scene);
-  },
 };
 
 export default GameHelpers;

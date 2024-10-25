@@ -19,7 +19,17 @@ class Map1Scene extends Phaser.Scene {
     this.load.image("door", "/assets/door.png");
   }
 
-  create() {
+  create(data) {
+    if (data.showLoadSlots && data.showSaveSlots) {
+      console.log("Received save/load functions in Map1Scene");
+      this.showLoadSlots = data.showLoadSlots;
+      this.showSaveSlots = data.showSaveSlots;
+      console.log("Load and Save methods attached to Map1Scene");
+    } else {
+      console.error("Failed to attach load and save methods in Map1Scene");
+    }
+
+
     const mapImage = this.add.image(400, 300, "placeholderMap1Scene");
     mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 
@@ -33,8 +43,11 @@ class Map1Scene extends Phaser.Scene {
       .setInteractive();
 
     this.battleZone.on("pointerdown", () => {
-      this.scene.start("BattleScene");
-    });
+      this.scene.start("BattleScene", {
+      showLoadSlots: this.showLoadSlots.bind(this),
+      showSaveSlots: this.saveGame.bind(this),
+        });
+      });
 
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,

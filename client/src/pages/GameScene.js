@@ -8,6 +8,10 @@ class GameScene extends Phaser.Scene {
     this.isLoggedIn = false;
     this.isGameInProgress = false; // Track if the game is in progress
     this.form = null; // Initialize form as null
+
+    // Bind the login and signup methods to this scene instance
+    this.showLoginForm = this.showLoginForm.bind(this);
+    this.showSignupForm = this.showSignupForm.bind(this);
   }
 
   preload() {
@@ -17,17 +21,17 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // Pass reference of `checkLoginStatus` to be used elsewhere
-    this.checkLoginStatus = this.checkLoginStatus.bind(this);
-    
+    // Debugging log
+    console.log("In create:", {
+      showLoginForm: this.showLoginForm,
+      showSignupForm: this.showSignupForm,
+    });
+
     // Check if user is logged in via token
     this.checkLoginStatus();
 
     // Set up the menu using the helper
-    GameHelpers.displayMainMenu(this, [
-      { text: "New Game", action: this.startNewGame.bind(this) },
-      { text: "Settings", action: this.openSettings.bind(this) },
-    ]);
+    GameHelpers.displayMainMenu(this);
     console.log("GameScene: create");
   }
 
@@ -36,9 +40,9 @@ class GameScene extends Phaser.Scene {
     this.isLoggedIn = !!token;
   }
 
-  
   // Shared form handling (login, sign up, save game, load game)
   showLoginForm() {
+    console.log("Login form should show now");
     // Clear the current menu content
     this.children.removeAll();
 
@@ -107,6 +111,7 @@ class GameScene extends Phaser.Scene {
 
   // Signup form logic
   showSignupForm() {
+    console.log("Signup form should show now");
     // Clear the current menu content
     this.children.removeAll();
 
@@ -137,22 +142,21 @@ class GameScene extends Phaser.Scene {
       const response = await signupUser(username, email, password);
       console.log("Signup response:", response);
 
-    
       if (response && response.token) {
-      localStorage.setItem("token", response.token);
-      this.isLoggedIn = true; // User is now signed up and logged in
-      console.log("Signup successful, token stored.");
+        localStorage.setItem("token", response.token);
+        this.isLoggedIn = true; // User is now signed up and logged in
+        console.log("Signup successful, token stored.");
 
-      // Remove the form
-      this.form.destroy();
+        // Remove the form
+        this.form.destroy();
 
-      // Re-enable keyboard input after the form is removed
-      this.input.keyboard.enabled = true;
+        // Re-enable keyboard input after the form is removed
+        this.input.keyboard.enabled = true;
 
-      GameHelpers.displayMainMenu(this); // Return to main menu
-    } else {
-      throw new Error("Signup failed. Please try again.");
-    }
+        GameHelpers.displayMainMenu(this); // Return to main menu
+      } else {
+        throw new Error("Signup failed. Please try again.");
+      }
     } catch (error) {
       console.error("Signup failed:", error);
       this.add
@@ -163,7 +167,6 @@ class GameScene extends Phaser.Scene {
         .setOrigin(0.5);
     }
   }
-
 
   // Return to main menu option from inside the game
   returnToMainMenu() {
@@ -180,7 +183,12 @@ class GameScene extends Phaser.Scene {
   // New Game logic
   startNewGame() {
     console.log("Start New Game clicked!");
-    this.scene.start("WorldMapScene");
+    console.log("showLoadSlots exists:", !!this.showLoadSlots);
+    console.log("showSaveSlots exists:", !!this.saveGame);
+    this.scene.start("TutorialScene", {
+      showLoadSlots: this.showLoadSlots.bind(this),
+      showSaveSlots: this.saveGame.bind(this),
+    });
   }
 
   async saveGame() {
@@ -211,7 +219,6 @@ class GameScene extends Phaser.Scene {
       text.on("pointerdown", () => this.performSave(slot)); // Save to the selected slot
     });
   }
-  
 
   // Perform save in the selected slot
   async performSave(slotNumber) {
@@ -315,11 +322,6 @@ class GameScene extends Phaser.Scene {
     console.log(`Load game from slot ${slotNumber}`);
     // Fetch data from the server, then start the game scene
     this.scene.start("WorldMapScene"); // Example for now
-  }
-
-  openSettings() {
-    console.log("Settings clicked!");
-    // Any settings functionalities should be implemented here!!
   }
 
   handlePlayerMovement(cursors, player) {

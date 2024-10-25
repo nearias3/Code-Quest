@@ -20,7 +20,18 @@ class WorldMapScene extends Phaser.Scene {
 
   }
 
-  create() {
+  create(data) {
+    // Attach the load and save methods if they are passed
+    if (data.showLoadSlots && data.showSaveSlots) {
+      console.log("Received save/load functions in WorldMapScene");
+        this.showLoadSlots = data.showLoadSlots;
+        this.showSaveSlots = data.showSaveSlots;
+        console.log("Attached showLoadSlots and showSaveSlots");
+    } else {
+        console.error("Load and Save slots not passed correctly.");
+    }
+
+    
     const mapImage = this.add.image(400, 300, "placeholderWorldMap");
     mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 
@@ -34,8 +45,11 @@ class WorldMapScene extends Phaser.Scene {
 
     this.battleZone = this.add.zone(500, 300, 100, 100).setInteractive();
     this.battleZone.on("pointerdown", () => {
-      this.scene.start("BattleScene");
-    });
+      this.scene.start("BattleScene", {
+      showLoadSlots: this.showLoadSlots.bind(this),
+      showSaveSlots: this.saveGame.bind(this),
+        });
+      });
 
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,
@@ -48,7 +62,7 @@ class WorldMapScene extends Phaser.Scene {
 
     // Listen for the "Enter" key to toggle pause
     this.input.keyboard.on("keydown-ENTER", () => {
-      GameHelpers.togglePauseMenu(this); 
+      GameHelpers.togglePauseMenu(this);
     });
   }
 

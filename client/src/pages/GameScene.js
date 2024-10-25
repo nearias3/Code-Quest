@@ -185,7 +185,7 @@ class GameScene extends Phaser.Scene {
     console.log("Start New Game clicked!");
     console.log("showLoadSlots exists:", !!this.showLoadSlots);
     console.log("showSaveSlots exists:", !!this.saveGame);
-    this.scene.start("WorldMapScene", {
+    this.scene.start("TutorialScene", {
       showLoadSlots: this.showLoadSlots.bind(this),
       showSaveSlots: this.saveGame.bind(this),
     });

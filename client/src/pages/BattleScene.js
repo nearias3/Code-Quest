@@ -3,7 +3,7 @@ import Phaser from "phaser";
 class BattleScene extends Phaser.Scene {
   constructor() {
     super({ key: "BattleScene" });
-    this.playerHealth = 100;
+    this.playerHealth = 250;
     this.enemyHealth = [50, 50, 50];
     this.currentTurn = "player";
   }

@@ -8,32 +8,26 @@ class WorldMapScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image(
-      "placeholderWorldMap",
-      "/assets/placeholderWorldMap.png"
+    this.load.tilemapTiledJSON(
+      "WorldMapSceneIsland",
+      "/assets/images/worldbuilding/WorldMapSceneIsland.tmj"
     );
     this.load.image("door", "/assets/door.png");
-    this.load.image(
-          "placeholderCharacter",
-          "/assets/placeholderCharacter.png"
-        );
-
+    this.load.image("placeholderCharacter", "/assets/placeholderCharacter.png");
   }
 
   create(data) {
     // Attach the load and save methods if they are passed
     if (data.showLoadSlots && data.showSaveSlots) {
       console.log("Received save/load functions in WorldMapScene");
-        this.showLoadSlots = data.showLoadSlots;
-        this.showSaveSlots = data.showSaveSlots;
-        console.log("Attached showLoadSlots and showSaveSlots");
+      this.showLoadSlots = data.showLoadSlots;
+      this.showSaveSlots = data.showSaveSlots;
+      console.log("Attached showLoadSlots and showSaveSlots");
     } else {
-        console.error("Load and Save slots not passed correctly.");
+      console.error("Load and Save slots not passed correctly.");
     }
 
-    
-    const mapImage = this.add.image(400, 300, "placeholderWorldMap");
-    mapImage.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+    const map = this.make.tilemap({ key: "WorldMapSceneIsland" });
 
     this.add
       .text(400, 50, "Dimension of Magic", { fontSize: "32px", fill: "#fff" })
@@ -46,10 +40,10 @@ class WorldMapScene extends Phaser.Scene {
     this.battleZone = this.add.zone(500, 300, 100, 100).setInteractive();
     this.battleZone.on("pointerdown", () => {
       this.scene.start("BattleScene", {
-      showLoadSlots: this.showLoadSlots.bind(this),
-      showSaveSlots: this.saveGame.bind(this),
-        });
+        showLoadSlots: this.showLoadSlots.bind(this),
+        showSaveSlots: this.saveGame.bind(this),
       });
+    });
 
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,
@@ -66,10 +60,14 @@ class WorldMapScene extends Phaser.Scene {
     });
   }
 
-
   update() {
     GameHelpers.handlePlayerMovement(this, this.cursors, this.player);
-    GameHelpers.checkDoorInteraction(this, this.player, this.door, 'BattleScene');
+    GameHelpers.checkDoorInteraction(
+      this,
+      this.player,
+      this.door,
+      "BattleScene"
+    );
   }
 }
 

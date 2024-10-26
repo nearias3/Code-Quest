@@ -182,16 +182,16 @@ const GameHelpers = {
     console.log(`Scene is:`, scene);
 
     // Mockup: Replace this with actual game data (e.g., player stats, progress)
-    const playerStats = {
-      level: 5,
-      health: 100,
-      mana: 50,
-    };
+    // const playerStats = {
+    //   level: 5,
+    //   health: 100,
+    //   mana: 50,
+    // };
 
-    const progress = {
-      currentStage: "WorldMap",
-      completedQuests: ["Placeholder Quest 1", "Placeholder Quest 2"],
-    };
+    // const progress = {
+    //   currentStage: "WorldMap",
+    //   completedQuests: ["Placeholder Quest 1", "Placeholder Quest 2"],
+    // };
 
     try {
       const response = await fetch("http://localhost:4000/api/save-game", {

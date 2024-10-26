@@ -10,31 +10,31 @@ class TutorialScene extends Phaser.Scene {
   preload() {
     this.load.image(
       "room1",
-      "../../public/assets/images/worldbuilding/room1-600x400.png"
+      "/assets/room1-600x400.png"
     );
     this.load.image(
       "room2",
-      "../../public/assets/images/worldbuilding/room2-x200.png"
+      "/assets/room2-x200.png"
     );
     this.load.image(
       "wall-hori",
-      "../../public/assets/images/worldbuilding/hori-wall-400x32.png"
+      "/assets/hori-wall-400x32.png"
     );
     this.load.image(
       "wall-vert",
-      "../../public/assets/images/worldbuilding/vert-wall-32x400.png"
+      "/assets/vert-wall-32x400.png"
     );
     this.load.image(
       "floor-button",
-      "../../public/assets/images/worldbuilding/floor-button.png"
+      "/assets/floor-button.png"
     );
     this.load.image(
       "door",
-      "../../public/assets/images/worldbuilding/door.png"
+      "/assets/door.png"
     );
     this.load.image(
       "apprentice",
-      "../../public/assets/images/worldbuilding/apprentice-01.png"
+      "/assets/mini-wiz.png"
     );
   }
 

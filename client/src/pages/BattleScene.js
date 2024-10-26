@@ -204,7 +204,7 @@ class BattleScene extends Phaser.Scene {
       .setOrigin(0.5);
     this.input.off("pointerdown"); // Disable input
     this.time.delayedCall(2000, () => {
-      this.scene.start("SomeOtherScene"); // Transition to another scene after 2 seconds
+      this.scene.start("WorldMapScene"); // Transition to another scene after 2 seconds
     });
   }
 

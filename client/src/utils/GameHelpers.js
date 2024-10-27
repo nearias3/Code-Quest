@@ -35,6 +35,7 @@ const GameHelpers = {
     } else {
       
       player.setVelocityX(0);
+      player.anims.play('idle', true);
 
     }
 
@@ -51,8 +52,10 @@ const GameHelpers = {
     } else {
       
       player.setVelocityY(0);
+      // player.anims.play('idle', true);
 
     }
+    
   },
 
   checkDoorInteraction(scene, player, door, targetScene) {

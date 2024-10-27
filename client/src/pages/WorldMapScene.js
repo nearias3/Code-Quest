@@ -161,7 +161,7 @@ class WorldMapScene extends Phaser.Scene {
     // Listen for the "E" key to interact
     this.input.keyboard.on("keydown-E", () => {
       console.log("Interact action triggered");
-      // Add your interaction logic here
+      this.checkInteractables();
     });
 
     // Create interaction text
@@ -175,6 +175,9 @@ class WorldMapScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0.5)
       .setVisible(false); // Initially hidden
+
+    // Create red squares
+    this.createInteractableSquares();
 
     // Camera that follows the player
     this.cameras.main.setBounds(0, 0, width, height); // Set the camera bounds
@@ -203,6 +206,40 @@ class WorldMapScene extends Phaser.Scene {
   showInteractionText(player, object) {
     this.interactionText.setVisible(true);
     this.interactionText.setPosition(player.x, player.y - 40);
+  }
+
+  createInteractableSquares() {
+    const squarePositions = [
+      { x: 100, y: 150 },
+      { x: 200, y: 150 },
+      { x: 300, y: 150 },
+      { x: 400, y: 150 },
+    ];
+
+    squarePositions.forEach((pos) => {
+      const square = this.add.rectangle(pos.x, pos.y, 30, 30, 0xff0000); // Create red square
+      this.physics.add.existing(square, true); // Make it static for collision
+      square.setOrigin(0.5, 0.5);
+      this.physics.add.overlap(
+        this.player,
+        square,
+        this.showInteractionText,
+        null,
+        this
+      );
+      square.setInteractive(); // Make it interactive
+    });
+  }
+
+  checkInteractables() {
+    this.physics.overlap(
+      this.player,
+      this.children.list.filter((child) => child.fillColor === 0xff0000),
+      (player, square) => {
+        console.log("Interacting with square");
+        this.scene.start("BattleScene"); // Start the BattleScene
+      }
+    );
   }
 }
 

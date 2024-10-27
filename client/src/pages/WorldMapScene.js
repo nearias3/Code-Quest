@@ -6,6 +6,7 @@ class WorldMapScene extends Phaser.Scene {
     super({ key: "WorldMapScene" });
     this.isPaused = false;
     this.interactionText = null; // For showing interaction text
+    this.coordinatesText = null; // For showing coordinates
   }
 
   preload() {
@@ -179,6 +180,14 @@ class WorldMapScene extends Phaser.Scene {
     // Create red squares
     this.createInteractableSquares();
 
+    // Create coordinates text
+    this.coordinatesText = this.add
+      .text(10, 10, `X: ${startX}, Y: ${startY}`, {
+        fontSize: "16px",
+        fill: "#ffffff",
+      })
+      .setScrollFactor(0); // Fix the coordinates text to the camera
+
     // Camera that follows the player
     this.cameras.main.setBounds(0, 0, width, height); // Set the camera bounds
     this.cameras.main.startFollow(this.player); // Camera follows the player
@@ -201,19 +210,27 @@ class WorldMapScene extends Phaser.Scene {
 
   update() {
     GameHelpers.handlePlayerMovement(this, this.cursors, this.player);
+    // Update coordinates text to stay in the top left corner
+    this.coordinatesText.setText(
+      `X: ${Math.round(this.player.x)}, Y: ${Math.round(this.player.y)}`
+    );
   }
 
   showInteractionText(player, object) {
     this.interactionText.setVisible(true);
-    this.interactionText.setPosition(player.x, player.y - 40);
+    this.interactionText.setPosition(player.x, player.y - 40); // Adjust position above the player
+  }
+
+  hideInteractionText() {
+    this.interactionText.setVisible(false);
   }
 
   createInteractableSquares() {
     const squarePositions = [
-      { x: 100, y: 150 },
-      { x: 200, y: 150 },
-      { x: 300, y: 150 },
-      { x: 400, y: 150 },
+      { x: 325, y: 1045 },
+      { x: 516, y: 908 },
+      { x: 1634, y: 873 },
+      { x: 1572, y: 353 },
     ];
 
     squarePositions.forEach((pos) => {

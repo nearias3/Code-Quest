@@ -8,25 +8,43 @@ class WorldMapScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image(
-      "02",
-      "/assets/images/worldbuilding/tilesets/02.png"
-    );  
+    this.load.image("02", "/assets/images/worldbuilding/tilesets/02.png");
     this.load.image("16", "/assets/images/worldbuilding/tilesets/16.png");
     this.load.image("17", "/assets/images/worldbuilding/tilesets/17.png");
-    this.load.image("Bridge_All", "/assets/images/worldbuilding/tilesets/Bridge_All.png");    
+    this.load.image(
+      "Bridge_All",
+      "/assets/images/worldbuilding/tilesets/Bridge_All.png"
+    );
     this.load.image(
       "Castle_Purple",
       "/assets/images/worldbuilding/tilesets/Castle_Purple.png"
     );
-    this.load.image("Goblin_House", "/assets/images/worldbuilding/tilesets/Goblin_House.png");
-    this.load.image("HappySheep_All", "/assets/images/worldbuilding/tilesets/HappySheep_All.png");
-    this.load.image("Rocks_04", "/assets/images/worldbuilding/tilesets/Rocks_04.png");  
-    this.load.image("Tilemap_Elevation", "/assets/images/worldbuilding/tilesets/Tilemap_Elevation.png"); 
-    this.load.image("Tilemap_Flat", "/assets/images/worldbuilding/tilesets/Tilemap_Flat.png"); 
+    this.load.image(
+      "Goblin_House",
+      "/assets/images/worldbuilding/tilesets/Goblin_House.png"
+    );
+    this.load.image(
+      "HappySheep_All",
+      "/assets/images/worldbuilding/tilesets/HappySheep_All.png"
+    );
+    this.load.image(
+      "Rocks_04",
+      "/assets/images/worldbuilding/tilesets/Rocks_04.png"
+    );
+    this.load.image(
+      "Tilemap_Elevation",
+      "/assets/images/worldbuilding/tilesets/Tilemap_Elevation.png"
+    );
+    this.load.image(
+      "Tilemap_Flat",
+      "/assets/images/worldbuilding/tilesets/Tilemap_Flat.png"
+    );
     this.load.image("Tree", "/assets/images/worldbuilding/tilesets/Tree.png");
-    this.load.image("W_Idle", "/assets/images/worldbuilding/tilesets/W_Idle.png");
-    this.load.image("Water", "/assets/images/worldbuilding/tilesets/Water.png");  
+    this.load.image(
+      "W_Idle",
+      "/assets/images/worldbuilding/tilesets/W_Idle.png"
+    );
+    this.load.image("Water", "/assets/images/worldbuilding/tilesets/Water.png");
     this.load.tilemapTiledJSON(
       "WorldMapSceneIsland",
       "/assets/images/worldbuilding/WorldMapSceneIsland.json"
@@ -70,7 +88,10 @@ class WorldMapScene extends Phaser.Scene {
     const tileset6 = map.addTilesetImage("Goblin_House", "Goblin_House");
     const tileset7 = map.addTilesetImage("HappySheep_All", "HappySheep_All");
     const tileset8 = map.addTilesetImage("Rocks_04", "Rocks_04");
-    const tileset9 = map.addTilesetImage("Tilemap_Elevation", "Tilemap_Elevation");
+    const tileset9 = map.addTilesetImage(
+      "Tilemap_Elevation",
+      "Tilemap_Elevation"
+    );
     const tileset10 = map.addTilesetImage("Tilemap_Flat", "Tilemap_Flat");
     const tileset11 = map.addTilesetImage("Tree", "Tree");
     const tileset12 = map.addTilesetImage("W_Idle", "W_Idle");
@@ -123,7 +144,11 @@ class WorldMapScene extends Phaser.Scene {
     });
 
     // Camera that follows the player
-    this.cameras.main.startFollow(this.player);
+    const width = map.widthInPixels;
+    const height = map.heightInPixels;
+
+    this.cameras.main.setBounds(0, 0, width, height); // Set the camera bounds
+    this.cameras.main.startFollow(this.player); // Camera follows the player
   }
 
   update() {

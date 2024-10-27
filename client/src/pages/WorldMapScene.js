@@ -116,6 +116,11 @@ class WorldMapScene extends Phaser.Scene {
 
     GameHelpers.createPlayer(this);
 
+    // Set the world bounds to match the tilemap size
+    const width = map.widthInPixels;
+    const height = map.heightInPixels;
+    this.physics.world.setBounds(0, 0, width, height); // Set world bounds
+
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,
       a: Phaser.Input.Keyboard.KeyCodes.A,
@@ -132,11 +137,11 @@ class WorldMapScene extends Phaser.Scene {
     });
 
     // Camera that follows the player
-    const width = map.widthInPixels;
-    const height = map.heightInPixels;
-
     this.cameras.main.setBounds(0, 0, width, height); // Set the camera bounds
     this.cameras.main.startFollow(this.player); // Camera follows the player
+
+    // Ensure the player can't move out of the world bounds
+    this.player.setCollideWorldBounds(true);
   }
 
   update() {

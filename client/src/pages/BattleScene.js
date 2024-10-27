@@ -34,8 +34,8 @@ class BattleScene extends Phaser.Scene {
     this.playerHealthBar = this.add.graphics();
     this.drawHealthBar(
       this.playerHealthBar,
-      this.player.x,
-      this.player.y - 20,
+      this.player.x - 25, // Centering the health bar (50px wide)
+      this.player.y - 80, // Y-coordinate remains -80
       this.playerHealth,
       100
     );
@@ -58,7 +58,7 @@ class BattleScene extends Phaser.Scene {
       { x: 700, y: 275 },
     ];
 
-    enemyPositions.forEach((pos, index) => {
+    enemyPositions.forEach((pos) => {
       const enemy = this.physics.add
         .sprite(pos.x, pos.y, "enemy")
         .setScale(-0.1, 0.1); // Flip enemy horizontally
@@ -70,7 +70,7 @@ class BattleScene extends Phaser.Scene {
       this.drawHealthBar(
         enemy.healthBar,
         enemy.x,
-        enemy.y - 20,
+        enemy.y - 80, // Y-coordinate remains -80
         enemy.health,
         50
       );
@@ -135,7 +135,7 @@ class BattleScene extends Phaser.Scene {
       this.drawHealthBar(
         enemy.healthBar,
         enemy.x,
-        enemy.y - 20,
+        enemy.y - 80, // Y-coordinate remains -80
         enemy.health,
         50
       ); // Update enemy health bar
@@ -156,7 +156,8 @@ class BattleScene extends Phaser.Scene {
   updateHealthText(enemy) {
     this.playerHealthText.setText(`Player Health: ${this.playerHealth}`);
     if (enemy.health <= 0) {
-      this.add.text(enemy.x, enemy.y - 20, "Defeated", {
+      this.add.text(enemy.x, enemy.y - 80, "Defeated", {
+        // Y-coordinate remains -80
         fontSize: "16px",
         fill: "#f00",
       });
@@ -179,8 +180,8 @@ class BattleScene extends Phaser.Scene {
             );
             this.drawHealthBar(
               this.playerHealthBar,
-              this.player.x,
-              this.player.y - 20,
+              this.player.x - 25, // Centering the health bar (50px wide)
+              this.player.y - 80, // Y-coordinate remains -80
               this.playerHealth,
               100
             ); // Update player health bar

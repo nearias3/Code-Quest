@@ -6,6 +6,8 @@ class BattleScene extends Phaser.Scene {
     this.playerHealth = 250;
     this.enemyHealth = [50, 50, 50];
     this.currentTurn = "player";
+    this.selectedAttackDamage = 0; // To store selected attack damage
+    this.selectedAttackBox = null; // To keep track of the selected attack box
   }
 
   preload() {
@@ -48,6 +50,7 @@ class BattleScene extends Phaser.Scene {
       enemy.play("enemy_idle");
     });
 
+    this.createAttackBox();
     this.input.on("pointerdown", this.handleAttack, this);
   }
 
@@ -74,6 +77,10 @@ class BattleScene extends Phaser.Scene {
         enemy.health,
         50
       );
+
+      // Enable enemy selection
+      enemy.setInteractive();
+      enemy.on("pointerdown", () => this.targetEnemy(enemy));
     });
   }
 
@@ -116,20 +123,68 @@ class BattleScene extends Phaser.Scene {
     });
   }
 
-  handleAttack() {
-    if (this.currentTurn === "player") {
-      const enemy = this.enemies.getChildren().find((e) => e.health > 0);
-      if (enemy) {
-        this.attackAnimation(enemy);
+  createAttackBox() {
+    const attackBox = this.add.graphics();
+    attackBox.fillStyle(0x000000, 0.7);
+    attackBox.fillRect(0, 400, 800, 100);
+
+    const attacks = [
+      { name: "Fireball", damage: 8 },
+      { name: "Wind Cutter", damage: 6 },
+      { name: "Water Blast", damage: 8 },
+      { name: "Rock Throw", damage: 10 },
+    ];
+
+    attacks.forEach((attack, index) => {
+      const x = index * 200 + 100; // Center boxes in the attack area
+      const attackBox = this.add
+        .rectangle(x, 450, 180, 70, 0xffffff)
+        .setOrigin(0.5)
+        .setInteractive();
+
+      attackBox.on("pointerdown", () =>
+        this.selectAttack(attack.damage, attackBox)
+      );
+
+      this.add
+        .text(x, 430, attack.name, { fontSize: "16px", fill: "#000" })
+        .setOrigin(0.5); // Center the text
+    });
+  }
+
+  selectAttack(damage, attackBox) {
+    this.selectedAttackDamage = damage;
+    this.highlightSelectedAttack(attackBox);
+    // Disable attack boxes after selection
+    this.children.list.forEach((child) => {
+      if (
+        child instanceof Phaser.GameObjects.Rectangle &&
+        child.height === 70
+      ) {
+        child.setInteractive(false); // Disable the attack boxes
       }
+    });
+  }
+
+  highlightSelectedAttack(attackBox) {
+    if (this.selectedAttackBox) {
+      // Remove highlight from previously selected attack
+      this.selectedAttackBox.setFillStyle(0xffffff); // Reset to default color
+    }
+    this.selectedAttackBox = attackBox; // Store reference to the selected box
+    attackBox.setFillStyle(0xffff00); // Highlight the selected attack (yellow)
+  }
+
+  targetEnemy(enemy) {
+    if (this.selectedAttackDamage > 0) {
+      this.attackAnimation(enemy);
     }
   }
 
   attackAnimation(enemy) {
     this.player.play("attack_animation");
     this.player.once("animationcomplete", () => {
-      const damage = Phaser.Math.Between(5, 15);
-      enemy.health -= damage;
+      enemy.health -= this.selectedAttackDamage;
       this.updateHealthText(enemy);
       this.player.setTexture("player", 0);
       this.drawHealthBar(
@@ -150,7 +205,19 @@ class BattleScene extends Phaser.Scene {
         this.currentTurn = "enemy"; // Switch to enemy turn
         this.enemyTurn();
       }
+
+      // Reset attack selection and highlight
+      this.selectedAttackDamage = 0; // Reset selected attack
+      this.resetAttackHighlight(); // Remove highlight from selected attack box
+      this.enableAttackBoxes(); // Re-enable attack boxes
     });
+  }
+
+  resetAttackHighlight() {
+    if (this.selectedAttackBox) {
+      this.selectedAttackBox.setFillStyle(0xffffff); // Reset to default color
+      this.selectedAttackBox = null; // Clear selected attack box
+    }
   }
 
   updateHealthText(enemy) {
@@ -162,6 +229,18 @@ class BattleScene extends Phaser.Scene {
         fill: "#f00",
       });
     }
+  }
+
+  enableAttackBoxes() {
+    // Re-enable attack boxes for next turn
+    this.children.list.forEach((child) => {
+      if (
+        child instanceof Phaser.GameObjects.Rectangle &&
+        child.height === 70
+      ) {
+        child.setInteractive(true); // Re-enable the attack boxes
+      }
+    });
   }
 
   enemyTurn() {

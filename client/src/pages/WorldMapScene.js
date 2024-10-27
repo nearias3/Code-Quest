@@ -118,19 +118,19 @@ class WorldMapScene extends Phaser.Scene {
     const collisionGroup = this.physics.add.staticGroup();
 
     // Create collision bodies from the collision layer
-const collisionLayer = map.getObjectLayer("Collision");
-if (collisionLayer) {
-  collisionLayer.objects.forEach((obj) => {
-    if (obj.width > 0 && obj.height > 0) {
-      // Create a static rectangle for collision
-      collisionGroup
-        .create(obj.x + obj.width / 2, obj.y + obj.height / 2, null)
-        .setSize(obj.width, obj.height)
-        .setOrigin(0.5, 0.5)
-        .setVisible(false); // Set the collision object to be invisible
+    const collisionLayer = map.getObjectLayer("Collision");
+    if (collisionLayer) {
+      collisionLayer.objects.forEach((obj) => {
+        if (obj.width > 0 && obj.height > 0) {
+          // Create a static rectangle for collision
+          collisionGroup
+            .create(obj.x + obj.width / 2, obj.y + obj.height / 2, null)
+            .setSize(obj.width, obj.height)
+            .setOrigin(0.5, 0.5)
+            .setVisible(false); // Set the collision object to be invisible
+        }
+      });
     }
-  });
-}
 
     GameHelpers.createPlayer(this);
     const startX = 250; // Change to your desired X position
@@ -155,6 +155,12 @@ if (collisionLayer) {
     // Listen for the "Enter" key to toggle pause
     this.input.keyboard.on("keydown-ENTER", () => {
       GameHelpers.togglePauseMenu(this);
+    });
+
+    // Listen for the "E" key to interact
+    this.input.keyboard.on("keydown-E", () => {
+      console.log("Interact action triggered");
+      // Add your interaction logic here
     });
 
     // Camera that follows the player

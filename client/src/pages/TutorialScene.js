@@ -10,40 +10,51 @@ class TutorialScene extends Phaser.Scene {
   preload() {
     this.load.image(
       "room1",
-      "../../public/assets/images/worldbuilding/room1-600x400.png"
+      "/assets/room1-600x400.png"
     );
     this.load.image(
       "room2",
-      "../../public/assets/images/worldbuilding/room2-x200.png"
+      "/assets/room2-x200.png"
     );
     this.load.image(
       "wall-hori",
-      "../../public/assets/images/worldbuilding/hori-wall-400x32.png"
+      "/assets/hori-wall-400x32.png"
     );
     this.load.image(
       "wall-vert",
-      "../../public/assets/images/worldbuilding/vert-wall-32x400.png"
+      "/assets/vert-wall-32x400.png"
     );
     this.load.image(
       "floor-button",
-      "../../public/assets/images/worldbuilding/floor-button.png"
+      "/assets/floor-button.png"
     );
     this.load.image(
       "door",
-      "../../public/assets/images/worldbuilding/door.png"
+      "/assets/door.png"
     );
+    // this.load.image(
+    //   "apprentice",
+    //   "/assets/mini-wiz.png"
+    // );
+    this.load.spritesheet('apprentice', 
+      '/assets/mini-wiz-walk.png', 
+      { frameWidth: 32, frameHeight: 32 });
     this.load.image(
-      "apprentice",
-      "../../public/assets/images/worldbuilding/apprentice-01.png"
+      'wiz-idle',
+      '/assets/mini-wiz.png'
     );
   }
 
-  create() {
-    // var player;
-    // var walls;
-    // var buttons;
-    // var doors;
-    // var cursors;
+  create(data) {
+    // Attach the load and save methods if they are passed
+    if (data.showLoadSlots && data.showSaveSlots) {
+      console.log("Received save/load functions in WorldMapScene");
+        this.showLoadSlots = data.showLoadSlots;
+        this.showSaveSlots = data.showSaveSlots;
+        console.log("Attached showLoadSlots and showSaveSlots");
+    } else {
+        console.error("Load and Save slots not passed correctly.");
+    }
 
     this.add.image(400, 400, "room1");
     this.add.image(400, 108, "room2");
@@ -71,10 +82,6 @@ class TutorialScene extends Phaser.Scene {
     this.walls.create(520, 200, "wall-hori").setScale(0.5).refreshBody();
     this.walls.create(280, 200, "wall-hori").setScale(0.5).refreshBody();
 
-    // this.buttons = this.physics.add.group({
-    //   key: "floor-button"
-    // });
-
     this.buttons = this.physics.add.group();
 
     this.buttons.create(200, 250, "floor-button");
@@ -89,9 +96,22 @@ class TutorialScene extends Phaser.Scene {
 
     GameHelpers.createPlayer(this);
 
+    this.anims.create({
+      key: 'walk',
+      frames: 'apprentice',
+      frameRate: 5,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'idle',
+      frames: [ { key: 'apprentice', frame: 0 } ],
+      frameRate: 2
+    });
+
     this.player.body.onOverlap = true;
 
-    this.player.setCollideWorldBounds(true);
+    // this.player.setCollideWorldBounds(true);
 
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,
@@ -100,11 +120,6 @@ class TutorialScene extends Phaser.Scene {
       d: Phaser.Input.Keyboard.KeyCodes.D,
     });
 
-    // function toggleButton(button) {
-    //   button.setScale(0.8);
-
-    // }
-
     this.physics.add.collider(this.player, this.walls);
     this.physics.add.collider(this.buttons, this.walls);
 
@@ -112,11 +127,6 @@ class TutorialScene extends Phaser.Scene {
 
     this.physics.world.on("overlap", (gameObj1, gameObj2, body1, body2) => {
       gameObj2.setScale(0.8);
-    });
-
-    this.physics.world.off("overlap", (gameObj1, gameObj2, body1, body2) => {
-      gameObj1.setScale(1.2);
-      console.log("wut");
     });
 
     GameHelpers.createPauseMenu(this);

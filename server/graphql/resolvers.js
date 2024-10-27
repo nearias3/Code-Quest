@@ -36,8 +36,14 @@ const resolvers = {
     enemies: async () => {
       return await Enemy.find({});
     },
+    enemy: async (parent, { name }) => {
+      return await Enemy.findOne({ name: name });
+    },
     items: async () => {
       return await Item.find({});
+    },
+    item: async (parent, { name }) => {
+      return await Item.findOne({ name: name });
     }
   },
   

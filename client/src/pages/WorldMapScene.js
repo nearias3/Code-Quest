@@ -7,6 +7,8 @@ class WorldMapScene extends Phaser.Scene {
     this.isPaused = false;
     this.interactionText = null; // For showing interaction text
     this.coordinatesText = null; // For showing coordinates
+    this.interactionRange = 100; // Distance threshold for interaction text visibility
+    this.lastInteractionSquare = null; // Track the last interacted square
   }
 
   preload() {
@@ -177,7 +179,7 @@ class WorldMapScene extends Phaser.Scene {
       .setOrigin(0.5, 0.5)
       .setVisible(false); // Initially hidden
 
-    // Create red squares
+    // Create invisible squares
     this.createInteractableSquares();
 
     // Create coordinates text
@@ -214,11 +216,26 @@ class WorldMapScene extends Phaser.Scene {
     this.coordinatesText.setText(
       `X: ${Math.round(this.player.x)}, Y: ${Math.round(this.player.y)}`
     );
+
+    // Check distance to the last interacted square
+    if (this.lastInteractionSquare) {
+      const distance = Phaser.Math.Distance.Between(
+        this.player.x,
+        this.player.y,
+        this.lastInteractionSquare.x,
+        this.lastInteractionSquare.y
+      );
+      if (distance > this.interactionRange) {
+        this.hideInteractionText();
+        this.lastInteractionSquare = null; // Reset the last interacted square
+      }
+    }
   }
 
   showInteractionText(player, object) {
     this.interactionText.setVisible(true);
     this.interactionText.setPosition(player.x, player.y - 40); // Adjust position above the player
+    this.lastInteractionSquare = object; // Store the last interacted square
   }
 
   hideInteractionText() {
@@ -234,7 +251,7 @@ class WorldMapScene extends Phaser.Scene {
     ];
 
     squarePositions.forEach((pos) => {
-      const square = this.add.rectangle(pos.x, pos.y, 30, 30, 0xff0000); // Create red square
+      const square = this.add.rectangle(pos.x, pos.y, 30, 30, 0x000000, 0); // Create invisible square
       this.physics.add.existing(square, true); // Make it static for collision
       square.setOrigin(0.5, 0.5);
       this.physics.add.overlap(
@@ -251,7 +268,7 @@ class WorldMapScene extends Phaser.Scene {
   checkInteractables() {
     this.physics.overlap(
       this.player,
-      this.children.list.filter((child) => child.fillColor === 0xff0000),
+      this.children.list.filter((child) => child.fillColor === 0x000000),
       (player, square) => {
         console.log("Interacting with square");
         this.scene.start("BattleScene"); // Start the BattleScene

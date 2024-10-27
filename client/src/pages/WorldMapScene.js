@@ -63,12 +63,13 @@ class WorldMapScene extends Phaser.Scene {
       console.error("Load and Save slots not passed correctly.");
     }
 
+    // Add your images
     this.add.image(0, 0, "02");
     this.add.image(0, 0, "16");
     this.add.image(0, 0, "17");
     this.add.image(0, 0, "Bridge_All");
     this.add.image(0, 0, "Castle_Purple");
-    this.add.image(0, 0, "Gobline_House");
+    this.add.image(0, 0, "Goblin_House");
     this.add.image(0, 0, "HappySheep_All");
     this.add.image(0, 0, "Rocks_04");
     this.add.image(0, 0, "Tilemap_Elevation");
@@ -115,22 +116,13 @@ class WorldMapScene extends Phaser.Scene {
 
     GameHelpers.createPlayer(this);
 
-    this.door = this.add.rectangle(700, 300, 50, 100, 0xff0000).setOrigin(-1.5);
-
-    this.battleZone = this.add.zone(500, 300, 100, 100).setInteractive();
-    this.battleZone.on("pointerdown", () => {
-      this.scene.start("BattleScene", {
-        showLoadSlots: this.showLoadSlots.bind(this),
-        showSaveSlots: this.saveGame.bind(this),
-      });
-    });
-
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,
       a: Phaser.Input.Keyboard.KeyCodes.A,
       s: Phaser.Input.Keyboard.KeyCodes.S,
       d: Phaser.Input.Keyboard.KeyCodes.D,
     });
+
     // Set up the pause menu using GameHelpers
     GameHelpers.createPauseMenu(this);
 
@@ -149,12 +141,6 @@ class WorldMapScene extends Phaser.Scene {
 
   update() {
     GameHelpers.handlePlayerMovement(this, this.cursors, this.player);
-    GameHelpers.checkDoorInteraction(
-      this,
-      this.player,
-      this.door,
-      "BattleScene"
-    );
   }
 }
 

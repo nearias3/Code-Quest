@@ -114,6 +114,24 @@ class WorldMapScene extends Phaser.Scene {
     map.createLayer("Mushrooms", tileset1);
     map.createLayer("Wood", tileset12);
 
+    // Create a static group for collision objects
+    const collisionGroup = this.physics.add.staticGroup();
+
+    // Create collision bodies from the collision layer
+const collisionLayer = map.getObjectLayer("Collision");
+if (collisionLayer) {
+  collisionLayer.objects.forEach((obj) => {
+    if (obj.width > 0 && obj.height > 0) {
+      // Create a static rectangle for collision
+      collisionGroup
+        .create(obj.x + obj.width / 2, obj.y + obj.height / 2, null)
+        .setSize(obj.width, obj.height)
+        .setOrigin(0.5, 0.5)
+        .setVisible(false); // Set the collision object to be invisible
+    }
+  });
+}
+
     GameHelpers.createPlayer(this);
     const startX = 250; // Change to your desired X position
     const startY = 200; // Change to your desired Y position
@@ -145,6 +163,9 @@ class WorldMapScene extends Phaser.Scene {
 
     // Ensure the player can't move out of the world bounds
     this.player.setCollideWorldBounds(true);
+
+    // Set up collision between the player and the collision group
+    this.physics.add.collider(this.player, collisionGroup);
   }
 
   update() {

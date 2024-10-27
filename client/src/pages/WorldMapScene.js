@@ -8,43 +8,25 @@ class WorldMapScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("02", "/assets/images/worldbuilding/tilesets/02.png");
+    this.load.image(
+      "02",
+      "/assets/images/worldbuilding/tilesets/02.png"
+    );  
     this.load.image("16", "/assets/images/worldbuilding/tilesets/16.png");
     this.load.image("17", "/assets/images/worldbuilding/tilesets/17.png");
-    this.load.image(
-      "Bridge_All",
-      "/assets/images/worldbuilding/tilesets/Bridge_All.png"
-    );
+    this.load.image("Bridge_All", "/assets/images/worldbuilding/tilesets/Bridge_All.png");    
     this.load.image(
       "Castle_Purple",
       "/assets/images/worldbuilding/tilesets/Castle_Purple.png"
     );
-    this.load.image(
-      "Goblin_House",
-      "/assets/images/worldbuilding/tilesets/Goblin_House.png"
-    );
-    this.load.image(
-      "HappySheep_All",
-      "/assets/images/worldbuilding/tilesets/HappySheep_All.png"
-    );
-    this.load.image(
-      "Rocks_04",
-      "/assets/images/worldbuilding/tilesets/Rocks_04.png"
-    );
-    this.load.image(
-      "Tilemap_Elevation",
-      "/assets/images/worldbuilding/tilesets/Tilemap_Elevation.png"
-    );
-    this.load.image(
-      "Tilemap_Flat",
-      "/assets/images/worldbuilding/tilesets/Tilemap_Flat.png"
-    );
+    this.load.image("Goblin_House", "/assets/images/worldbuilding/tilesets/Goblin_House.png");
+    this.load.image("HappySheep_All", "/assets/images/worldbuilding/tilesets/HappySheep_All.png");
+    this.load.image("Rocks_04", "/assets/images/worldbuilding/tilesets/Rocks_04.png");  
+    this.load.image("Tilemap_Elevation", "/assets/images/worldbuilding/tilesets/Tilemap_Elevation.png"); 
+    this.load.image("Tilemap_Flat", "/assets/images/worldbuilding/tilesets/Tilemap_Flat.png"); 
     this.load.image("Tree", "/assets/images/worldbuilding/tilesets/Tree.png");
-    this.load.image(
-      "W_Idle",
-      "/assets/images/worldbuilding/tilesets/W_Idle.png"
-    );
-    this.load.image("Water", "/assets/images/worldbuilding/tilesets/Water.png");
+    this.load.image("W_Idle", "/assets/images/worldbuilding/tilesets/W_Idle.png");
+    this.load.image("Water", "/assets/images/worldbuilding/tilesets/Water.png");  
     this.load.tilemapTiledJSON(
       "WorldMapSceneIsland",
       "/assets/images/worldbuilding/WorldMapSceneIsland.json"
@@ -88,10 +70,7 @@ class WorldMapScene extends Phaser.Scene {
     const tileset6 = map.addTilesetImage("Goblin_House", "Goblin_House");
     const tileset7 = map.addTilesetImage("HappySheep_All", "HappySheep_All");
     const tileset8 = map.addTilesetImage("Rocks_04", "Rocks_04");
-    const tileset9 = map.addTilesetImage(
-      "Tilemap_Elevation",
-      "Tilemap_Elevation"
-    );
+    const tileset9 = map.addTilesetImage("Tilemap_Elevation", "Tilemap_Elevation");
     const tileset10 = map.addTilesetImage("Tilemap_Flat", "Tilemap_Flat");
     const tileset11 = map.addTilesetImage("Tree", "Tree");
     const tileset12 = map.addTilesetImage("W_Idle", "W_Idle");
@@ -113,7 +92,21 @@ class WorldMapScene extends Phaser.Scene {
     map.createLayer("Mushrooms", tileset1);
     map.createLayer("Wood", tileset12);
 
+    this.add
+      .text(400, 50, "Dimension of Magic", { fontSize: "32px", fill: "#fff" })
+      .setOrigin(0.5);
+
     GameHelpers.createPlayer(this);
+
+    this.door = this.add.rectangle(700, 300, 50, 100, 0xff0000).setOrigin(-1.5);
+
+    this.battleZone = this.add.zone(500, 300, 100, 100).setInteractive();
+    this.battleZone.on("pointerdown", () => {
+      this.scene.start("BattleScene", {
+        showLoadSlots: this.showLoadSlots.bind(this),
+        showSaveSlots: this.saveGame.bind(this),
+      });
+    });
 
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,

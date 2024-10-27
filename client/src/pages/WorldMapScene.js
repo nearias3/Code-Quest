@@ -5,6 +5,7 @@ class WorldMapScene extends Phaser.Scene {
   constructor() {
     super({ key: "WorldMapScene" });
     this.isPaused = false;
+    this.interactionText = null; // For showing interaction text
   }
 
   preload() {
@@ -163,6 +164,18 @@ class WorldMapScene extends Phaser.Scene {
       // Add your interaction logic here
     });
 
+    // Create interaction text
+    this.interactionText = this.add
+      .text(startX, startY - 40, "Press E to Interact", {
+        fontSize: "16px",
+        fill: "#ffffff",
+        backgroundColor: "#000000",
+        padding: { x: 5, y: 5 },
+        align: "center",
+      })
+      .setOrigin(0.5, 0.5)
+      .setVisible(false); // Initially hidden
+
     // Camera that follows the player
     this.cameras.main.setBounds(0, 0, width, height); // Set the camera bounds
     this.cameras.main.startFollow(this.player); // Camera follows the player
@@ -172,10 +185,24 @@ class WorldMapScene extends Phaser.Scene {
 
     // Set up collision between the player and the collision group
     this.physics.add.collider(this.player, collisionGroup);
+
+    // Check for proximity to interactable objects
+    this.physics.add.overlap(
+      this.player,
+      collisionGroup,
+      this.showInteractionText,
+      null,
+      this
+    );
   }
 
   update() {
     GameHelpers.handlePlayerMovement(this, this.cursors, this.player);
+  }
+
+  showInteractionText(player, object) {
+    this.interactionText.setVisible(true);
+    this.interactionText.setPosition(player.x, player.y - 40);
   }
 }
 

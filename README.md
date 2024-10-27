@@ -29,20 +29,22 @@ THEN my progress will be saved and will be able to pick back up where i left off
 
 ## Usage
 
-To try out the game visit this link. [Link](Enter link)
+To try out the game visit this link. [Link](https://wizard-s-apprentice.onrender.com)
 
 Checkout the GitHub Repository link. [Link](https://github.com/nearias3/Wizard-s-Apprentice)
 
 ## Built With:
 
 - React
+- Express
 - MongoDB
+- Mongoose
 - GraphQL
 - Phaser
 
 ## Preview
 
-![Main page](/Users/adalbertomorones/Downloads/bootcamp/repos/Wizard-s-Apprentice/client/public/assets/mainpage.png)
+
 
 ## Credits
 

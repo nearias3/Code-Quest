@@ -115,6 +115,9 @@ class WorldMapScene extends Phaser.Scene {
     map.createLayer("Wood", tileset12);
 
     GameHelpers.createPlayer(this);
+    const startX = 250; // Change to your desired X position
+    const startY = 200; // Change to your desired Y position
+    this.player.setPosition(startX, startY);
 
     // Set the world bounds to match the tilemap size
     const width = map.widthInPixels;

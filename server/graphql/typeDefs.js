@@ -34,7 +34,9 @@ const typeDefs = gql`
     me: User
     getSaveSlots(userId: ID!): [SaveSlot]
     enemies: [Enemy]
-    items: [Item]    
+    enemy(name: String!): Enemy
+    items: [Item]
+    item(name: String!): Item
   }
 
   type AuthPayload {

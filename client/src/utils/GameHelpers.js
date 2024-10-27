@@ -19,20 +19,39 @@ const GameHelpers = {
   },
 
   handlePlayerMovement(scene, cursors, player) {
+
     if (cursors.a.isDown) {
+
+      player.setFlipX(false);
       player.setVelocityX(-160);
+      player.anims.play('walk', true);
+
     } else if (cursors.d.isDown) {
+      
+      player.setFlipX(true);
       player.setVelocityX(160);
+      player.anims.play('walk', true);
+
     } else {
+      
       player.setVelocityX(0);
+
     }
 
     if (cursors.w.isDown) {
+      
       player.setVelocityY(-160);
+      player.anims.play('walk', true);
+
     } else if (cursors.s.isDown) {
+      
       player.setVelocityY(160);
+      player.anims.play('walk', true);
+
     } else {
+      
       player.setVelocityY(0);
+
     }
   },
 

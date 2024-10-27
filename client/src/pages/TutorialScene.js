@@ -32,9 +32,16 @@ class TutorialScene extends Phaser.Scene {
       "door",
       "/assets/door.png"
     );
+    // this.load.image(
+    //   "apprentice",
+    //   "/assets/mini-wiz.png"
+    // );
+    this.load.spritesheet('apprentice', 
+      '/assets/mini-wiz-walk.png', 
+      { frameWidth: 32, frameHeight: 32 });
     this.load.image(
-      "apprentice",
-      "/assets/mini-wiz.png"
+      'wiz-idle',
+      '/assets/mini-wiz.png'
     );
   }
 
@@ -89,9 +96,22 @@ class TutorialScene extends Phaser.Scene {
 
     GameHelpers.createPlayer(this);
 
+    this.anims.create({
+      key: 'walk',
+      frames: 'apprentice',
+      frameRate: 5,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'idle',
+      frames: [ { key: 'apprentice', frame: 0 } ],
+      frameRate: 2
+    });
+
     this.player.body.onOverlap = true;
 
-    this.player.setCollideWorldBounds(true);
+    // this.player.setCollideWorldBounds(true);
 
     this.cursors = this.input.keyboard.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,

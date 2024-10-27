@@ -113,10 +113,6 @@ class WorldMapScene extends Phaser.Scene {
     map.createLayer("Mushrooms", tileset1);
     map.createLayer("Wood", tileset12);
 
-    this.add
-      .text(400, 50, "Dimension of Magic", { fontSize: "32px", fill: "#fff" })
-      .setOrigin(0.5);
-
     GameHelpers.createPlayer(this);
 
     this.door = this.add.rectangle(700, 300, 50, 100, 0xff0000).setOrigin(-1.5);

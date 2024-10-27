@@ -44,7 +44,7 @@ Checkout the GitHub Repository link. [Link](https://github.com/nearias3/Wizard-s
 
 ## Preview
 
-
+![alt text](<client/public/assets/Main Page.png>)
 
 ## Credits
 

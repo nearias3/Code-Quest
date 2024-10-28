@@ -66,7 +66,7 @@ class WorldMapScene extends Phaser.Scene {
       console.error("Load and Save slots not passed correctly.");
     }
 
-    // Add your images
+    // Images
     this.add.image(0, 0, "02");
     this.add.image(0, 0, "16");
     this.add.image(0, 0, "17");

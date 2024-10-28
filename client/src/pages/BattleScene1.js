@@ -88,7 +88,7 @@ class BattleScene1 extends Phaser.Scene {
   }
 
   createEnemies() {
-    let randNum = Math.random;
+    let randNum = Math.random();
 
     if (randNum >= 0.6) {
       this.randEnemy = "semicolon";
@@ -96,7 +96,8 @@ class BattleScene1 extends Phaser.Scene {
       this.randEnemy = "curly-bracket";
     }
 
-    console.log(`randEnemy = ${this.randEnemy}`);
+    console.log(`randEnemy = ${this.randEnemy}
+      randNum = ${randNum}`);
 
     const enemyPositions = [
       { x: 500, y: 275 },
@@ -244,6 +245,13 @@ class BattleScene1 extends Phaser.Scene {
         }
 
         if (this.enemies.getLength() === 0) {
+
+          this.anims.remove("player_idle");
+          this.anims.remove("enemy_idle");
+          this.anims.remove("attack_animation");
+          this.anims.remove("enemy_attack");
+          this.randEnemy = null;
+          
           this.endBattle("You Win!");
         } else {
           this.currentTurn = "enemy";
@@ -314,6 +322,13 @@ class BattleScene1 extends Phaser.Scene {
             );
 
             if (this.playerHealth <= 0) {
+
+              this.anims.remove("player_idle");
+              this.anims.remove("enemy_idle");
+              this.anims.remove("attack_animation");
+              this.anims.remove("enemy_attack");
+              this.randEnemy = null;
+              
               this.endBattle("Game Over!");
             }
           },

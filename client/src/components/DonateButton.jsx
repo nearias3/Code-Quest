@@ -15,7 +15,7 @@ const DonateButton = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ amount: 5 }), // Example donation amount in dollars (50 USD)
+        body: JSON.stringify({ amount: 5 }), 
       }
     );
 

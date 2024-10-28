@@ -17,22 +17,14 @@ class GameScene extends Phaser.Scene {
   preload() {
     GameHelpers.preloadSharedAssets(this);
     // Load assets (sprites, images, etc.)
-    console.log("GameScene: preload");
   }
 
   create() {
-    // Debugging log
-    console.log("In create:", {
-      showLoginForm: this.showLoginForm,
-      showSignupForm: this.showSignupForm,
-    });
-
     // Check if user is logged in via token
     this.checkLoginStatus();
 
     // Set up the menu using the helper
     GameHelpers.displayMainMenu(this);
-    console.log("GameScene: create");
   }
 
   checkLoginStatus() {
@@ -42,7 +34,6 @@ class GameScene extends Phaser.Scene {
 
   // Shared form handling (login, sign up, save game, load game)
   showLoginForm() {
-    console.log("Login form should show now");
     // Clear the current menu content
     this.children.removeAll();
 
@@ -81,12 +72,10 @@ class GameScene extends Phaser.Scene {
   async attemptLogin(username, password) {
     try {
       const response = await loginUser(username, password);
-      console.log("Login response:", response);
 
       if (response && response.login && response.login.token) {
         localStorage.setItem("token", response.login.token);
         this.isLoggedIn = true; // Mark the user as logged in
-        console.log("Login successful, token stored.");
 
         // Remove the form
         this.form.destroy();
@@ -111,7 +100,6 @@ class GameScene extends Phaser.Scene {
 
   // Signup form logic
   showSignupForm() {
-    console.log("Signup form should show now");
     // Clear the current menu content
     this.children.removeAll();
 
@@ -140,12 +128,10 @@ class GameScene extends Phaser.Scene {
   async attemptSignup(username, email, password) {
     try {
       const response = await signupUser(username, email, password);
-      console.log("Signup response:", response);
 
       if (response && response.token) {
         localStorage.setItem("token", response.token);
         this.isLoggedIn = true; // User is now signed up and logged in
-        console.log("Signup successful, token stored.");
 
         // Remove the form
         this.form.destroy();
@@ -176,15 +162,11 @@ class GameScene extends Phaser.Scene {
   logout() {
     localStorage.removeItem("token");
     this.isLoggedIn = false; // Mark the user as logged out
-    console.log("Logged out");
     GameHelpers.displayMainMenu(this); // Refresh the menu after logging out
   }
 
   // New Game logic
   startNewGame() {
-    console.log("Start New Game clicked!");
-    console.log("showLoadSlots exists:", !!this.showLoadSlots);
-    console.log("showSaveSlots exists:", !!this.saveGame);
     this.scene.start("TutorialScene", {
       showLoadSlots: this.showLoadSlots.bind(this),
       showSaveSlots: this.saveGame.bind(this),
@@ -192,7 +174,6 @@ class GameScene extends Phaser.Scene {
   }
 
   async saveGame() {
-    console.log("Save Game clicked!");
 
     // Clear current menu items
     this.children.removeAll();
@@ -221,23 +202,9 @@ class GameScene extends Phaser.Scene {
   }
 
   // Perform save in the selected slot
-  async performSave(slotNumber) {
-    console.log(`Saving game to slot ${slotNumber}...`);
-
-    // Mockup: Replace this actual game data (e.g., player stats, progress)
-    const playerStats = {
-      level: 5,
-      health: 100,
-      mana: 50,
-    };
-
-    const progress = {
-      currentStage: "WorldMap",
-      completedQuests: ["Placeholder Quest 1", "Placeholder Quest 2"],
-    };
+  async performSave(scene, slotNumber) {
 
     try {
-      // Replace this with actual API function for saving the game once we build that
       const response = await fetch("http://localhost:4000/api/save-game", {
         method: "POST",
         headers: {
@@ -246,15 +213,13 @@ class GameScene extends Phaser.Scene {
         },
         body: JSON.stringify({
           slotNumber,
-          playerStats,
-          progress,
+          scene
         }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        console.log("Game saved successfully to slot ${slotNumber}:", result);
         this.add
           .text(400, 400, "Game Saved!", {
             fontSize: "18px",

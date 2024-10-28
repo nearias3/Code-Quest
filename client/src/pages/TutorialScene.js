@@ -48,10 +48,8 @@ class TutorialScene extends Phaser.Scene {
   create(data) {
     // Attach the load and save methods if they are passed
     if (data.showLoadSlots && data.showSaveSlots) {
-      console.log("Received save/load functions in WorldMapScene");
         this.showLoadSlots = data.showLoadSlots;
         this.showSaveSlots = data.showSaveSlots;
-        console.log("Attached showLoadSlots and showSaveSlots");
     } else {
         console.error("Load and Save slots not passed correctly.");
     }

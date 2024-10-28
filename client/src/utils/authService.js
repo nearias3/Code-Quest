@@ -20,7 +20,7 @@ const LOGIN_USER = gql`
   mutation login($username: String!, $password: String!) {
     login(username: $username, password: $password) {
       _id
-      Username
+      username
       token
     }
   }
@@ -40,6 +40,7 @@ const client = new ApolloClient({
 
 // Login function
 export async function loginUser(username, password) {
+  
   const { data } = await client.mutate({
     mutation: LOGIN_USER,
     variables: { username, password },

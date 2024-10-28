@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import GameHelpers from "../utils/GameHelpers";
 
 class BattleScene3 extends Phaser.Scene {
   constructor() {
@@ -9,6 +10,7 @@ class BattleScene3 extends Phaser.Scene {
     this.selectedAttackDamage = 0; // To store selected attack damage
     this.selectedAttackBox = null; // To keep track of the selected attack box
     this.targetedEnemy = null; // Store the selected target
+    this.isPaused = false;
     this.randEnemy = null;
   }
 
@@ -28,7 +30,14 @@ class BattleScene3 extends Phaser.Scene {
     });
   }
 
-  create() {
+  create(data) {
+    if (data.showLoadSlots && data.showSaveSlots) {
+      this.showLoadSlots = data.showLoadSlots;
+      this.showSaveSlots = data.showSaveSlots;
+    } else {
+      console.error("Load and Save slots not passed correctly.");
+    }
+
     this.add.image(400, 300, "background");
     this.player = this.physics.add.sprite(200, 400, "player").setScale(0.1);
 
@@ -57,6 +66,14 @@ class BattleScene3 extends Phaser.Scene {
 
     this.createAttackBox();
     this.input.on("pointerdown", this.handlePointerDown, this);
+
+    // Set up the pause menu using GameHelpers
+    GameHelpers.createPauseMenu(this);
+
+    // Listen for the "Enter" key to toggle pause
+    this.input.keyboard.on("keydown-ENTER", () => {
+      GameHelpers.togglePauseMenu(this);
+    });
   }
 
   handlePointerDown(pointer) {

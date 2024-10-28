@@ -1,13 +1,20 @@
 import Phaser from "phaser";
 
 const GameHelpers = {
+  // Global state variable for player position
+  playerPosition: { x: 400, y: 300 },
+
   preloadSharedAssets(scene) {
     // Load shared assets
     console.log(scene);
   },
 
   createPlayer(scene) {
-    scene.player = scene.physics.add.sprite(400, 300, "apprentice");
+    scene.player = scene.physics.add.sprite(
+      this.playerPosition.x,
+      this.playerPosition.y,
+      "apprentice"
+    );
     scene.player.setCollideWorldBounds(true);
 
     // LEAVING THS IN CASE WE NEED IT LATER vvv
@@ -28,7 +35,7 @@ const GameHelpers = {
     } else if (cursors.d.isDown) {
       player.setFlipX(true);
       player.setVelocityX(160);
-      moving = true; 
+      moving = true;
     } else {
       player.setVelocityX(0);
     }
@@ -48,6 +55,10 @@ const GameHelpers = {
     } else {
       player.anims.play("idle", true);
     }
+
+    // Update global player position
+    this.playerPosition.x = player.x;
+    this.playerPosition.y = player.y;
   },
 
   checkDoorInteraction(scene, player, door, targetScene) {

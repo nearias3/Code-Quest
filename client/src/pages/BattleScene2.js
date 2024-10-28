@@ -8,6 +8,7 @@ class BattleScene2 extends Phaser.Scene {
     this.currentTurn = "player";
     this.selectedAttackDamage = 0; // To store selected attack damage
     this.selectedAttackBox = null; // To keep track of the selected attack box
+    this.targetedEnemy = null; // Store the selected target
   }
 
   preload() {
@@ -26,17 +27,15 @@ class BattleScene2 extends Phaser.Scene {
     this.add.image(400, 300, "background");
     this.player = this.physics.add.sprite(200, 400, "player").setScale(0.1);
 
-    // Create health bar for player
     this.playerHealthBar = this.add.graphics();
     this.drawHealthBar(
       this.playerHealthBar,
-      this.player.x - 25, // Centering the health bar (50px wide)
-      this.player.y - 80, // Y-coordinate remains -80
+      this.player.x - 25,
+      this.player.y - 80,
       this.playerHealth,
-      50 // Updated max health
+      50
     );
 
-    // Player health text above the health bar
     this.playerHealthText = this.add
       .text(
         this.player.x - 25,
@@ -50,12 +49,21 @@ class BattleScene2 extends Phaser.Scene {
     this.createEnemies();
     this.createAnimations();
     this.player.play("player_idle");
-    this.enemies.children.iterate((enemy) => {
-      enemy.play("enemy_idle");
-    });
 
     this.createAttackBox();
-    this.input.on("pointerdown", this.handleAttack, this);
+    this.input.on("pointerdown", this.handlePointerDown, this);
+  }
+
+  handlePointerDown(pointer) {
+    if (this.selectedAttackDamage > 0) {
+      // If an attack is selected, try to select an enemy
+      const enemy = this.enemies
+        .getChildren()
+        .find((e) => e.getBounds().contains(pointer.x, pointer.y));
+      if (enemy && enemy.health > 0) {
+        this.targetEnemy(enemy);
+      }
+    }
   }
 
   createEnemies() {
@@ -68,25 +76,22 @@ class BattleScene2 extends Phaser.Scene {
     enemyPositions.forEach((pos) => {
       const enemy = this.physics.add
         .sprite(pos.x, pos.y, "enemy")
-        .setScale(-0.1, 0.1); // Flip enemy horizontally
-      enemy.health = 15; // Updated enemy health
+        .setScale(-0.1, 0.1);
+      enemy.health = 15;
       this.enemies.add(enemy);
 
-      // Create health bar for each enemy
       enemy.healthBar = this.add.graphics();
       this.drawHealthBar(
         enemy.healthBar,
         enemy.x,
-        enemy.y - 80, // Y-coordinate remains -80
+        enemy.y - 80,
         enemy.health,
-        15 // Updated max health
+        15
       );
 
-      // Enable enemy selection
       enemy.setInteractive();
       enemy.on("pointerdown", () => this.targetEnemy(enemy));
 
-      // Add health text next to enemy
       enemy.healthText = this.add
         .text(enemy.x, enemy.y - 90, `${enemy.health} / 15`, {
           fontSize: "14px",
@@ -98,11 +103,11 @@ class BattleScene2 extends Phaser.Scene {
 
   drawHealthBar(graphics, x, y, currentHealth, maxHealth) {
     graphics.clear();
-    graphics.fillStyle(0xff0000, 1); // Red color for the health bar
-    graphics.fillRect(x - 25, y, 50, 8); // Background health bar
-    graphics.fillStyle(0x00ff00, 1); // Green color for current health
-    const healthWidth = Math.max(0, (currentHealth / maxHealth) * 50); // Ensure health doesn't go below 0
-    graphics.fillRect(x - 25, y, healthWidth, 8); // Current health bar
+    graphics.fillStyle(0xff0000, 1);
+    graphics.fillRect(x - 25, y, 50, 8);
+    graphics.fillStyle(0x00ff00, 1);
+    const healthWidth = Math.max(0, (currentHealth / maxHealth) * 50);
+    graphics.fillRect(x - 25, y, healthWidth, 8);
   }
 
   createAnimations() {
@@ -148,7 +153,7 @@ class BattleScene2 extends Phaser.Scene {
     ];
 
     attacks.forEach((attack, index) => {
-      const x = index * 200 + 100; // Center boxes in the attack area
+      const x = index * 200 + 100;
       const attackBox = this.add
         .rectangle(x, 450, 180, 70, 0xffffff)
         .setOrigin(0.5)
@@ -160,118 +165,121 @@ class BattleScene2 extends Phaser.Scene {
 
       this.add
         .text(x, 430, attack.name, { fontSize: "16px", fill: "#000" })
-        .setOrigin(0.5); // Center the text
+        .setOrigin(0.5);
     });
   }
 
   selectAttack(damage, attackBox) {
     this.selectedAttackDamage = damage;
     this.highlightSelectedAttack(attackBox);
-    // Disable attack boxes after selection
-    this.children.list.forEach((child) => {
-      if (
-        child instanceof Phaser.GameObjects.Rectangle &&
-        child.height === 70
-      ) {
-        child.setInteractive(false); // Disable the attack boxes
-      }
-    });
+    this.targetedEnemy = null; // Reset targeted enemy
+    this.enableEnemySelection(); // Allow selecting enemies
   }
 
   highlightSelectedAttack(attackBox) {
     if (this.selectedAttackBox) {
-      // Remove highlight from previously selected attack
-      this.selectedAttackBox.setFillStyle(0xffffff); // Reset to default color
+      this.selectedAttackBox.setFillStyle(0xffffff);
     }
-    this.selectedAttackBox = attackBox; // Store reference to the selected box
-    attackBox.setFillStyle(0xffff00); // Highlight the selected attack (yellow)
+    this.selectedAttackBox = attackBox;
+    attackBox.setFillStyle(0xffff00);
   }
 
   targetEnemy(enemy) {
-    if (this.selectedAttackDamage > 0) {
-      this.attackAnimation(enemy);
-    }
+    this.targetedEnemy = enemy; // Store reference to the selected target
+    this.attackAnimation(enemy);
   }
 
-  attackAnimation(enemy) {
+  attackAnimation() {
     this.player.play("attack_animation");
     this.player.once("animationcomplete", () => {
-      enemy.health -= this.selectedAttackDamage;
-      enemy.health = Math.max(0, enemy.health); // Ensure health doesn't go below 0
-      this.updateHealthText(enemy);
-      this.player.setTexture("player", 0);
-      this.drawHealthBar(
-        enemy.healthBar,
-        enemy.x,
-        enemy.y - 80, // Y-coordinate remains -80
-        enemy.health,
-        15 // Updated max health
-      ); // Update enemy health bar
+      if (this.targetedEnemy) {
+        this.targetedEnemy.health -= this.selectedAttackDamage;
+        this.targetedEnemy.health = Math.max(0, this.targetedEnemy.health);
+        this.updateHealthText(this.targetedEnemy);
+        this.player.setTexture("player", 0);
+        this.drawHealthBar(
+          this.targetedEnemy.healthBar,
+          this.targetedEnemy.x,
+          this.targetedEnemy.y - 80,
+          this.targetedEnemy.health,
+          15
+        );
 
-      if (enemy.health <= 0) {
-        enemy.healthBar.clear(); // Clear enemy health bar
-        enemy.healthText.setVisible(false); // Hide enemy health text
-        this.enemies.remove(enemy, true); // Remove enemy if defeated
-      }
+        if (this.targetedEnemy.health <= 0) {
+          this.targetedEnemy.healthBar.clear();
+          this.targetedEnemy.healthText.setVisible(false);
+          this.enemies.remove(this.targetedEnemy, true);
+        }
 
-      if (this.enemies.getLength() === 0) {
-        this.endBattle("You Win!");
-      } else {
-        this.currentTurn = "enemy"; // Switch to enemy turn
-        this.enemyTurn();
+        if (this.enemies.getLength() === 0) {
+          this.endBattle("You Win!");
+        } else {
+          this.currentTurn = "enemy";
+          this.enemyTurn();
+        }
       }
 
       // Reset attack selection and highlight
-      this.selectedAttackDamage = 0; // Reset selected attack
-      this.resetAttackHighlight(); // Remove highlight from selected attack box
+      this.selectedAttackDamage = 0;
+      this.resetAttackHighlight();
+      this.disableEnemySelection(); // Disable enemy selection
       this.enableAttackBoxes(); // Re-enable attack boxes
     });
   }
 
   resetAttackHighlight() {
     if (this.selectedAttackBox) {
-      this.selectedAttackBox.setFillStyle(0xffffff); // Reset to default color
-      this.selectedAttackBox = null; // Clear selected attack box
+      this.selectedAttackBox.setFillStyle(0xffffff);
+      this.selectedAttackBox = null;
     }
   }
 
   updateHealthText(enemy) {
-    this.playerHealthText.setText(`${this.playerHealth} / 50`); // Update player health text
-    enemy.healthText.setText(`${enemy.health} / 15`); // Update enemy health text
+    this.playerHealthText.setText(`${this.playerHealth} / 50`);
+    enemy.healthText.setText(`${enemy.health} / 15`);
   }
 
   enableAttackBoxes() {
-    // Re-enable attack boxes for next turn
     this.children.list.forEach((child) => {
       if (
         child instanceof Phaser.GameObjects.Rectangle &&
         child.height === 70
       ) {
-        child.setInteractive(true); // Re-enable the attack boxes
+        child.setInteractive(true);
       }
+    });
+  }
+
+  enableEnemySelection() {
+    this.enemies.getChildren().forEach((enemy) => {
+      enemy.setInteractive();
+    });
+  }
+
+  disableEnemySelection() {
+    this.enemies.getChildren().forEach((enemy) => {
+      enemy.setInteractive(false);
     });
   }
 
   enemyTurn() {
     this.enemies.getChildren().forEach((enemy) => {
       if (enemy.health > 0) {
-        // Enemy attacks the player
         enemy.play("enemy_attack");
         this.time.delayedCall(
           500,
           () => {
-            // Delay to allow animation to play
-            const damage = Phaser.Math.Between(1, 5); // Updated to random damage between 1 and 5
-            this.playerHealth -= damage; // Enemy deals damage
-            this.playerHealth = Math.max(0, this.playerHealth); // Ensure player health doesn't go below 0
-            this.playerHealthText.setText(`${this.playerHealth} / 50`); // Update player health text
+            const damage = Phaser.Math.Between(1, 3);
+            this.playerHealth -= damage;
+            this.playerHealth = Math.max(0, this.playerHealth);
+            this.playerHealthText.setText(`${this.playerHealth} / 50`);
             this.drawHealthBar(
               this.playerHealthBar,
-              this.player.x - 25, // Centering the health bar (50px wide)
-              this.player.y - 80, // Y-coordinate remains -80
+              this.player.x - 25,
+              this.player.y - 80,
               this.playerHealth,
-              50 // Updated max health
-            ); // Update player health bar
+              50
+            );
 
             if (this.playerHealth <= 0) {
               this.endBattle("Game Over!");
@@ -290,15 +298,13 @@ class BattleScene2 extends Phaser.Scene {
     this.add
       .text(400, 300, message, { fontSize: "32px", fill: "#fff" })
       .setOrigin(0.5);
-    this.input.off("pointerdown"); // Disable input
+    this.input.off("pointerdown");
     this.time.delayedCall(2000, () => {
-      this.scene.start("WorldMapScene"); // Transition to another scene after 2 seconds
+      this.scene.start("WorldMapScene");
     });
   }
 
-  update() {
-    // Handle any ongoing updates if necessary
-  }
+  update() {}
 }
 
 export default BattleScene2;

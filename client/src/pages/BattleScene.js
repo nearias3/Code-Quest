@@ -25,12 +25,6 @@ class BattleScene extends Phaser.Scene {
   create() {
     this.add.image(400, 300, "background");
     this.player = this.physics.add.sprite(200, 400, "player").setScale(0.1);
-    this.playerHealthText = this.add.text(
-      10,
-      10,
-      `Player Health: ${this.playerHealth}`,
-      { fontSize: "16px", fill: "#fff" }
-    );
 
     // Create health bar for player
     this.playerHealthBar = this.add.graphics();
@@ -41,6 +35,16 @@ class BattleScene extends Phaser.Scene {
       this.playerHealth,
       50 // Updated max health
     );
+
+    // Player health text above the health bar
+    this.playerHealthText = this.add
+      .text(
+        this.player.x - 25,
+        this.player.y - 100,
+        `${this.playerHealth} / 50`,
+        { fontSize: "16px", fill: "#fff" }
+      )
+      .setOrigin(0.5);
 
     this.enemies = this.physics.add.group();
     this.createEnemies();
@@ -229,7 +233,7 @@ class BattleScene extends Phaser.Scene {
   }
 
   updateHealthText(enemy) {
-    this.playerHealthText.setText(`Player Health: ${this.playerHealth}`);
+    this.playerHealthText.setText(`${this.playerHealth} / 50`); // Update player health text
     if (enemy.health <= 0) {
       this.add.text(enemy.x, enemy.y - 80, "Defeated", {
         // Y-coordinate remains -80
@@ -261,11 +265,9 @@ class BattleScene extends Phaser.Scene {
           500,
           () => {
             // Delay to allow animation to play
-            const damage = Phaser.Math.Between(5, 10); // Random enemy damage between 5 and 10
+            const damage = Phaser.Math.Between(1, 3); // Updated to random damage between 1 and 3
             this.playerHealth -= damage; // Enemy deals damage
-            this.playerHealthText.setText(
-              `Player Health: ${this.playerHealth}`
-            );
+            this.playerHealthText.setText(`${this.playerHealth} / 50`); // Update player health text
             this.drawHealthBar(
               this.playerHealthBar,
               this.player.x - 25, // Centering the health bar (50px wide)

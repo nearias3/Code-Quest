@@ -39,7 +39,7 @@ class BattleScene extends Phaser.Scene {
       this.player.x - 25, // Centering the health bar (50px wide)
       this.player.y - 80, // Y-coordinate remains -80
       this.playerHealth,
-      100
+      50 // Updated max health
     );
 
     this.enemies = this.physics.add.group();
@@ -75,12 +75,20 @@ class BattleScene extends Phaser.Scene {
         enemy.x,
         enemy.y - 80, // Y-coordinate remains -80
         enemy.health,
-        50
+        15 // Updated max health
       );
 
       // Enable enemy selection
       enemy.setInteractive();
       enemy.on("pointerdown", () => this.targetEnemy(enemy));
+
+      // Add health text next to enemy
+      enemy.healthText = this.add
+        .text(enemy.x, enemy.y - 90, `${enemy.health} / 15`, {
+          fontSize: "14px",
+          fill: "#fff",
+        })
+        .setOrigin(0.5);
     });
   }
 
@@ -192,7 +200,7 @@ class BattleScene extends Phaser.Scene {
         enemy.x,
         enemy.y - 80, // Y-coordinate remains -80
         enemy.health,
-        50
+        15 // Updated max health
       ); // Update enemy health bar
 
       if (enemy.health <= 0) {
@@ -229,6 +237,7 @@ class BattleScene extends Phaser.Scene {
         fill: "#f00",
       });
     }
+    enemy.healthText.setText(`${enemy.health} / 15`); // Update enemy health text
   }
 
   enableAttackBoxes() {
@@ -262,7 +271,7 @@ class BattleScene extends Phaser.Scene {
               this.player.x - 25, // Centering the health bar (50px wide)
               this.player.y - 80, // Y-coordinate remains -80
               this.playerHealth,
-              100
+              50 // Updated max health
             ); // Update player health bar
 
             if (this.playerHealth <= 0) {

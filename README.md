@@ -42,9 +42,9 @@ To try out the game visit this link. [Link](https://wizard-s-apprentice.onrender
 
 Checkout the GitHub Repository link. [Link](https://github.com/nearias3/Wizard-s-Apprentice)
 
-![Screenshot of Homeage](/images/Screenshot1.png)
-![Screenshot of Game](/images/Screenshot2.png)
-![Screenshot of Login Page](/images/Screenshot3.png)
+![Screenshot of Homeage](/assets/images/Screenshot1.png)
+![Screenshot of Game](/assets/images/Screenshot2.png)
+![Screenshot of Login Page](/assets/images/Screenshot3.png)
 
 ## License
     

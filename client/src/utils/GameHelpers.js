@@ -19,43 +19,35 @@ const GameHelpers = {
   },
 
   handlePlayerMovement(scene, cursors, player) {
+    let moving = false;
 
     if (cursors.a.isDown) {
-
       player.setFlipX(false);
       player.setVelocityX(-160);
-      player.anims.play('walk', true);
-
+      moving = true;
     } else if (cursors.d.isDown) {
-      
       player.setFlipX(true);
       player.setVelocityX(160);
-      player.anims.play('walk', true);
-
+      moving = true; 
     } else {
-      
       player.setVelocityX(0);
-      player.anims.play('idle', true);
-
     }
 
     if (cursors.w.isDown) {
-      
       player.setVelocityY(-160);
-      player.anims.play('walk', true);
-
+      moving = true;
     } else if (cursors.s.isDown) {
-      
       player.setVelocityY(160);
-      player.anims.play('walk', true);
-
+      moving = true;
     } else {
-      
       player.setVelocityY(0);
-      // player.anims.play('idle', true);
-
     }
-    
+
+    if (moving) {
+      player.anims.play("walk", true);
+    } else {
+      player.anims.play("idle", true);
+    }
   },
 
   checkDoorInteraction(scene, player, door, targetScene) {
@@ -245,7 +237,6 @@ const GameHelpers = {
         scene.time.delayedCall(3000, () => {
           savedText.destroy();
         });
-
       } else {
         throw new Error(result.message || "Failed to save game.");
       }
@@ -359,24 +350,23 @@ const GameHelpers = {
       additionalOptions = [loadText, saveText];
 
       // Add interactivity for load and save game
-        loadText.on("pointerdown", () => {
-          if (typeof scene.showLoadSlots === "function") {
-            console.log("Loading game...");
-            GameHelpers.showLoadSlots(scene);
-          } else {
-            console.error("showLoadSlots is not defined on this scene.");
-          }
-        });
+      loadText.on("pointerdown", () => {
+        if (typeof scene.showLoadSlots === "function") {
+          console.log("Loading game...");
+          GameHelpers.showLoadSlots(scene);
+        } else {
+          console.error("showLoadSlots is not defined on this scene.");
+        }
+      });
 
-        saveText.on("pointerdown", () => {
-          if (typeof scene.showSaveSlots === "function") {
-            console.log("Saving game...");
-            GameHelpers.showSaveSlots(scene);
-          } else {
-            console.error("showSaveSlots is not defined on this scene.");
-          }
-        });
-
+      saveText.on("pointerdown", () => {
+        if (typeof scene.showSaveSlots === "function") {
+          console.log("Saving game...");
+          GameHelpers.showSaveSlots(scene);
+        } else {
+          console.error("showSaveSlots is not defined on this scene.");
+        }
+      });
     }
 
     // Quit Game (this option is for both logged-in and not-logged-in users)
@@ -417,7 +407,6 @@ const GameHelpers = {
     scene.physics.resume(); // Resume physics
     scene.pauseMenu.setVisible(false); // Hide pause menu
   },
-
 };
 
 export default GameHelpers;

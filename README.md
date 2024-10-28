@@ -21,8 +21,7 @@ THEN I am presented with a home page with a signup/login screen.
 WHEN I login I will be taken to the Home Screen with a menu option..
 THEN I can select to play a new game or continue an existing game.
 WHEN I am in the map I will be able to roam different areas of the map. THEN I can complete side quest as well as engage in turn-based battle with opponents.
-WHEN I have completed a (insert progress in order to move on)
-THEN I can utilize a door that will take me to other map levels.
+
 WHEN I need to step away, and save progress I will be able to click "Enter" and will be given an option to save.
 THEN my progress will be saved and will be able to pick back up where i left off.
 ```
@@ -41,10 +40,15 @@ Checkout the GitHub Repository link. [Link](https://github.com/nearias3/Wizard-s
 - Mongoose
 - GraphQL
 - Phaser
+- Tiled
 
 ## Preview
 
 ![alt text](<client/public/assets/Main Page.png>)
+
+![alt text](client/public/assets/MapPage1.png)
+
+![alt text](client/public/assets/MapPage2.png)
 
 ## Credits
 

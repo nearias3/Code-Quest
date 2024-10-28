@@ -9,6 +9,7 @@ class WorldMapScene extends Phaser.Scene {
     this.coordinatesText = null; // For showing coordinates
     this.interactionRange = 100; // Distance threshold for interaction text visibility
     this.lastInteractionSquare = null; // Track the last interacted square
+    
   }
 
   preload() {
@@ -59,10 +60,8 @@ class WorldMapScene extends Phaser.Scene {
   create(data) {
     // Attach the load and save methods if they are passed
     if (data.showLoadSlots && data.showSaveSlots) {
-      console.log("Received save/load functions in WorldMapScene");
       this.showLoadSlots = data.showLoadSlots;
       this.showSaveSlots = data.showSaveSlots;
-      console.log("Attached showLoadSlots and showSaveSlots");
     } else {
       console.error("Load and Save slots not passed correctly.");
     }
@@ -137,8 +136,8 @@ class WorldMapScene extends Phaser.Scene {
     }
 
     GameHelpers.createPlayer(this);
-    const startX = 250; // Change to your desired X position
-    const startY = 200; // Change to your desired Y position
+    const startX = 250;
+    const startY = 200;
     this.player.setPosition(startX, startY);
 
     // Set the world bounds to match the tilemap size
@@ -163,7 +162,6 @@ class WorldMapScene extends Phaser.Scene {
 
     // Listen for the "E" key to interact
     this.input.keyboard.on("keydown-E", () => {
-      console.log("Interact action triggered");
       this.checkInteractables();
     });
 
@@ -208,6 +206,7 @@ class WorldMapScene extends Phaser.Scene {
       null,
       this
     );
+
   }
 
   update() {
@@ -271,7 +270,6 @@ class WorldMapScene extends Phaser.Scene {
       this.player,
       this.children.list.filter((child) => child.fillColor === 0x000000),
       (player, square) => {
-        console.log("Interacting with square");
         this.scene.start(square.sceneName); // Start the respective BattleScene
       }
     );

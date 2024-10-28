@@ -4,9 +4,7 @@ const GameHelpers = {
   // Global state variable for player position
   playerPosition: { x: 400, y: 300 },
 
-  preloadSharedAssets(scene) {
-    // Load shared assets
-    console.log(scene);
+  preloadSharedAssets() {
   },
 
   createPlayer(scene) {
@@ -16,13 +14,6 @@ const GameHelpers = {
       "apprentice"
     );
     scene.player.setCollideWorldBounds(true);
-
-    // LEAVING THS IN CASE WE NEED IT LATER vvv
-    // const scaleFactor = 0.1;
-    // scene.player.setDisplaySize(
-    //   scene.player.width * scaleFactor,
-    //   scene.player.height * scaleFactor
-    // );
   },
 
   handlePlayerMovement(scene, cursors, player) {
@@ -71,9 +62,6 @@ const GameHelpers = {
   },
 
   displayMainMenu(scene) {
-    console.log("Scene Key:", scene.scene.key);
-    console.log("Has showLoginForm:", typeof scene.showLoginForm);
-    console.log("Scene object:", scene);
 
     if (typeof scene.showLoginForm !== "function") {
       console.error("showLoginForm is not defined on this scene");
@@ -203,20 +191,6 @@ const GameHelpers = {
 
   // Save game data to a selected slot
   async performSave(scene, slotNumber) {
-    console.log(`Starting performSave for slot ${slotNumber}...`);
-    console.log(`Scene is:`, scene);
-
-    // Mockup: Replace this with actual game data (e.g., player stats, progress)
-    // const playerStats = {
-    //   level: 5,
-    //   health: 100,
-    //   mana: 50,
-    // };
-
-    // const progress = {
-    //   currentStage: "WorldMap",
-    //   completedQuests: ["Placeholder Quest 1", "Placeholder Quest 2"],
-    // };
 
     try {
       const response = await fetch("http://localhost:4000/api/save-game", {
@@ -227,16 +201,13 @@ const GameHelpers = {
         },
         body: JSON.stringify({
           slotNumber,
-          playerStats,
-          progress,
+          scene
         }),
       });
 
       const result = await response.json();
-      console.log("Response from server:", result);
 
       if (response.ok) {
-        console.log(`Game saved successfully to slot ${slotNumber}:`, result);
         const savedText = scene.add
           .text(400, 350, "Game Saved!", {
             fontSize: "18px",
@@ -287,9 +258,6 @@ const GameHelpers = {
 
   // Load game data from the selected slot
   async loadGame(scene, slotNumber) {
-    console.log(`Starting loadGame for slot ${slotNumber}...`);
-    console.log(`Scene is:`, scene);
-
     try {
       const response = await fetch(
         `http://localhost:4000/api/load-game/${slotNumber}`,
@@ -302,15 +270,13 @@ const GameHelpers = {
       );
 
       const result = await response.json();
-      console.log("Response from server:", result);
 
       if (response.ok) {
-        console.log(`Game loaded from slot ${slotNumber}:`, result);
-
         // Load the player's progress and start the game scene
         scene.scene.start("WorldMapScene", {
           playerStats: result.playerStats,
           progress: result.progress,
+          scene: result.scene,
         });
       } else {
         throw new Error(result.message || "Failed to load game.");
@@ -363,7 +329,6 @@ const GameHelpers = {
       // Add interactivity for load and save game
       loadText.on("pointerdown", () => {
         if (typeof scene.showLoadSlots === "function") {
-          console.log("Loading game...");
           GameHelpers.showLoadSlots(scene);
         } else {
           console.error("showLoadSlots is not defined on this scene.");
@@ -372,7 +337,6 @@ const GameHelpers = {
 
       saveText.on("pointerdown", () => {
         if (typeof scene.showSaveSlots === "function") {
-          console.log("Saving game...");
           GameHelpers.showSaveSlots(scene);
         } else {
           console.error("showSaveSlots is not defined on this scene.");

@@ -10,7 +10,8 @@ class BattleScene3 extends Phaser.Scene {
     this.selectedAttackDamage = 0; // To store selected attack damage
     this.selectedAttackBox = null; // To keep track of the selected attack box
     this.targetedEnemy = null; // Store the selected target
-        this.isPaused = false;
+    this.isPaused = false;
+    this.randEnemy = null;
   }
 
   preload() {
@@ -19,7 +20,11 @@ class BattleScene3 extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
-    this.load.image("enemy", "/assets/skeleton.png", {
+    this.load.image("semicolon", "/assets/semicolon.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.image("curly-bracket", "/assets/curly-bracket.png", {
       frameWidth: 64,
       frameHeight: 64,
     });
@@ -84,6 +89,17 @@ class BattleScene3 extends Phaser.Scene {
   }
 
   createEnemies() {
+    let randNum = Math.random();
+
+    if (randNum >= 0.6) {
+      this.randEnemy = "semicolon";
+    } else {
+      this.randEnemy = "curly-bracket";
+    }
+
+    console.log(`randEnemy = ${this.randEnemy}
+      randNum = ${randNum}`);
+
     const enemyPositions = [
       { x: 500, y: 275 },
       { x: 600, y: 275 },
@@ -92,7 +108,8 @@ class BattleScene3 extends Phaser.Scene {
 
     enemyPositions.forEach((pos) => {
       const enemy = this.physics.add
-        .sprite(pos.x, pos.y, "enemy")
+        .sprite(pos.x, pos.y, this.randEnemy)
+        .setFlip(true, false)
         .setScale(-0.1, 0.1);
       enemy.health = 15;
       this.enemies.add(enemy);
@@ -137,7 +154,7 @@ class BattleScene3 extends Phaser.Scene {
 
     this.anims.create({
       key: "enemy_idle",
-      frames: [{ key: "enemy", frame: 0 }],
+      frames: [{ key: this.randEnemy, frame: 0 }],
       frameRate: 10,
       repeat: -1,
     });
@@ -151,7 +168,7 @@ class BattleScene3 extends Phaser.Scene {
 
     this.anims.create({
       key: "enemy_attack",
-      frames: [{ key: "enemy", frame: 1 }],
+      frames: [{ key: this.randEnemy, frame: 1 }],
       frameRate: 10,
       repeat: 0,
     });
@@ -229,6 +246,13 @@ class BattleScene3 extends Phaser.Scene {
         }
 
         if (this.enemies.getLength() === 0) {
+
+          this.anims.remove("player_idle");
+          this.anims.remove("enemy_idle");
+          this.anims.remove("attack_animation");
+          this.anims.remove("enemy_attack");
+          this.randEnemy = null;
+          
           this.endBattle("You Win!");
         } else {
           this.currentTurn = "enemy";
@@ -299,6 +323,13 @@ class BattleScene3 extends Phaser.Scene {
             );
 
             if (this.playerHealth <= 0) {
+
+              this.anims.remove("player_idle");
+              this.anims.remove("enemy_idle");
+              this.anims.remove("attack_animation");
+              this.anims.remove("enemy_attack");
+              this.randEnemy = null;
+              
               this.endBattle("Game Over!");
             }
           },

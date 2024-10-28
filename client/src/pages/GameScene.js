@@ -286,7 +286,10 @@ class GameScene extends Phaser.Scene {
   loadGame(slotNumber) {
     console.log(`Load game from slot ${slotNumber}`);
     // Fetch data from the server, then start the game scene
-    this.scene.start("WorldMapScene"); 
+    this.scene.start("WorldMapScene", {
+      showLoadSlots: this.showLoadSlots.bind(this),
+      showSaveSlots: this.saveGame.bind(this),
+    }); // Example for now
   }
 
   handlePlayerMovement(cursors, player) {

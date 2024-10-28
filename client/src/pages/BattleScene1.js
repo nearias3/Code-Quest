@@ -9,6 +9,7 @@ class BattleScene1 extends Phaser.Scene {
     this.selectedAttackDamage = 0; // To store selected attack damage
     this.selectedAttackBox = null; // To keep track of the selected attack box
     this.targetedEnemy = null; // Store the selected target
+    this.randEnemy = null;
   }
 
   preload() {
@@ -17,7 +18,11 @@ class BattleScene1 extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
-    this.load.image("enemy", "/assets/skeleton.png", {
+    this.load.image("semicolon", "/assets/semicolon.png", {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.image("curly-bracket", "/assets/curly-bracket.png", {
       frameWidth: 64,
       frameHeight: 64,
     });
@@ -67,6 +72,16 @@ class BattleScene1 extends Phaser.Scene {
   }
 
   createEnemies() {
+    let randNum = Math.random;
+
+    if (randNum >= 0.6) {
+      this.randEnemy = "semicolon";
+    } else {
+      this.randEnemy = "curly-bracket";
+    }
+
+    console.log(`randEnemy = ${this.randEnemy}`);
+
     const enemyPositions = [
       { x: 500, y: 275 },
       { x: 600, y: 275 },
@@ -75,7 +90,8 @@ class BattleScene1 extends Phaser.Scene {
 
     enemyPositions.forEach((pos) => {
       const enemy = this.physics.add
-        .sprite(pos.x, pos.y, "enemy")
+        .sprite(pos.x, pos.y, this.randEnemy)
+        .setFlip(true, false)
         .setScale(-0.1, 0.1);
       enemy.health = 15;
       this.enemies.add(enemy);
@@ -120,7 +136,7 @@ class BattleScene1 extends Phaser.Scene {
 
     this.anims.create({
       key: "enemy_idle",
-      frames: [{ key: "enemy", frame: 0 }],
+      frames: [{ key: this.RandEnemy, frame: 0 }],
       frameRate: 10,
       repeat: -1,
     });
@@ -134,7 +150,7 @@ class BattleScene1 extends Phaser.Scene {
 
     this.anims.create({
       key: "enemy_attack",
-      frames: [{ key: "enemy", frame: 1 }],
+      frames: [{ key: this.randEnemy, frame: 1 }],
       frameRate: 10,
       repeat: 0,
     });

@@ -101,7 +101,7 @@ class BattleScene extends Phaser.Scene {
     graphics.fillStyle(0xff0000, 1); // Red color for the health bar
     graphics.fillRect(x - 25, y, 50, 8); // Background health bar
     graphics.fillStyle(0x00ff00, 1); // Green color for current health
-    const healthWidth = (currentHealth / maxHealth) * 50; // Calculate width based on health
+    const healthWidth = Math.max(0, (currentHealth / maxHealth) * 50); // Ensure health doesn't go below 0
     graphics.fillRect(x - 25, y, healthWidth, 8); // Current health bar
   }
 
@@ -197,6 +197,7 @@ class BattleScene extends Phaser.Scene {
     this.player.play("attack_animation");
     this.player.once("animationcomplete", () => {
       enemy.health -= this.selectedAttackDamage;
+      enemy.health = Math.max(0, enemy.health); // Ensure health doesn't go below 0
       this.updateHealthText(enemy);
       this.player.setTexture("player", 0);
       this.drawHealthBar(
@@ -208,6 +209,8 @@ class BattleScene extends Phaser.Scene {
       ); // Update enemy health bar
 
       if (enemy.health <= 0) {
+        enemy.healthBar.clear(); // Clear enemy health bar
+        enemy.healthText.setVisible(false); // Hide enemy health text
         this.enemies.remove(enemy, true); // Remove enemy if defeated
       }
 
@@ -234,13 +237,6 @@ class BattleScene extends Phaser.Scene {
 
   updateHealthText(enemy) {
     this.playerHealthText.setText(`${this.playerHealth} / 50`); // Update player health text
-    if (enemy.health <= 0) {
-      this.add.text(enemy.x, enemy.y - 80, "Defeated", {
-        // Y-coordinate remains -80
-        fontSize: "16px",
-        fill: "#f00",
-      });
-    }
     enemy.healthText.setText(`${enemy.health} / 15`); // Update enemy health text
   }
 
@@ -265,8 +261,9 @@ class BattleScene extends Phaser.Scene {
           500,
           () => {
             // Delay to allow animation to play
-            const damage = Phaser.Math.Between(1, 3); // Updated to random damage between 1 and 3
+            const damage = Phaser.Math.Between(1, 5); // Updated to random damage between 1 and 5
             this.playerHealth -= damage; // Enemy deals damage
+            this.playerHealth = Math.max(0, this.playerHealth); // Ensure player health doesn't go below 0
             this.playerHealthText.setText(`${this.playerHealth} / 50`); // Update player health text
             this.drawHealthBar(
               this.playerHealthBar,

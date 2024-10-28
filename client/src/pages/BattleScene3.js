@@ -1,13 +1,13 @@
 import Phaser from "phaser";
 
-class BattleScene extends Phaser.Scene {
+class BattleScene3 extends Phaser.Scene {
   constructor() {
-    super({ key: "BattleScene" });
-    this.playerHealth = 50;
-    this.enemyHealth = [15, 15, 15];
+    super({ key: "BattleScene3" });
+    this.playerHealth = 50; // Updated player health
+    this.enemyHealth = [15, 15, 15]; // Updated enemy health
     this.currentTurn = "player";
-    this.selectedAttackDamage = 0;
-    this.selectedAttackBox = null;
+    this.selectedAttackDamage = 0; // To store selected attack damage
+    this.selectedAttackBox = null; // To keep track of the selected attack box
     this.targetedEnemy = null; // Store the selected target
   }
 
@@ -307,4 +307,4 @@ class BattleScene extends Phaser.Scene {
   update() {}
 }
 
-export default BattleScene;
+export default BattleScene3;

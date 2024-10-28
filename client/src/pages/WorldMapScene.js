@@ -244,10 +244,10 @@ class WorldMapScene extends Phaser.Scene {
 
   createInteractableSquares() {
     const squarePositions = [
-      { x: 325, y: 1045 },
-      { x: 516, y: 908 },
-      { x: 1634, y: 873 },
-      { x: 1572, y: 353 },
+      { x: 325, y: 1045, scene: "BattleScene1" },
+      { x: 516, y: 908, scene: "BattleScene2" },
+      { x: 1634, y: 873, scene: "BattleScene3" },
+      { x: 1572, y: 353, scene: "BattleScene4" },
     ];
 
     squarePositions.forEach((pos) => {
@@ -262,6 +262,7 @@ class WorldMapScene extends Phaser.Scene {
         this
       );
       square.setInteractive(); // Make it interactive
+      square.sceneName = pos.scene; // Store the scene name for interaction
     });
   }
 
@@ -271,7 +272,7 @@ class WorldMapScene extends Phaser.Scene {
       this.children.list.filter((child) => child.fillColor === 0x000000),
       (player, square) => {
         console.log("Interacting with square");
-        this.scene.start("BattleScene"); // Start the BattleScene
+        this.scene.start(square.sceneName); // Start the respective BattleScene
       }
     );
   }

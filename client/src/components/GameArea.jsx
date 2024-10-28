@@ -40,7 +40,7 @@ const GameArea = ({ onLogin }) => {
         createContainer: true,
       },
       audio: {
-        noAudio: true, // Disabled audio to avoid warning in console until we get actual audio
+        noAudio: true, // Disabled audio
       },
     };
 

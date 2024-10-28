@@ -11,7 +11,6 @@ import "./assets/css/styles.css";
 
 const App = () => {
   const handleLogin = () => {
-    console.log("User logged in!");
   };
 
   return (

@@ -13,7 +13,6 @@ require("dotenv").config();
 const PORT = process.env.PORT || 4000;
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-console.log("Stripe Secret Key:", stripeSecretKey); 
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 

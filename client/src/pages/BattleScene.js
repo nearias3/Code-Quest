@@ -3,8 +3,8 @@ import Phaser from "phaser";
 class BattleScene extends Phaser.Scene {
   constructor() {
     super({ key: "BattleScene" });
-    this.playerHealth = 250;
-    this.enemyHealth = [50, 50, 50];
+    this.playerHealth = 50; // Updated player health
+    this.enemyHealth = [15, 15, 15]; // Updated enemy health
     this.currentTurn = "player";
     this.selectedAttackDamage = 0; // To store selected attack damage
     this.selectedAttackBox = null; // To keep track of the selected attack box
@@ -65,7 +65,7 @@ class BattleScene extends Phaser.Scene {
       const enemy = this.physics.add
         .sprite(pos.x, pos.y, "enemy")
         .setScale(-0.1, 0.1); // Flip enemy horizontally
-      enemy.health = 50;
+      enemy.health = 15; // Updated enemy health
       this.enemies.add(enemy);
 
       // Create health bar for each enemy
